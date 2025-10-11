@@ -1,4 +1,4 @@
-package com.redkey.duraping.config;
+package sh.redkey.mc.duraping.config;
 
 import net.minecraft.util.Identifier;
 

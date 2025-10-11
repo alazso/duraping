@@ -1,12 +1,12 @@
-package com.redkey.duraping;
+package sh.redkey.mc.duraping;
 
-import com.redkey.duraping.config.ConfigManager;
-import com.redkey.duraping.config.DuraPingConfig;
-import com.redkey.duraping.hud.HudFlashOverlay;
-import com.redkey.duraping.keybind.Keybinds;
-import com.redkey.duraping.sound.ModSounds;
-import com.redkey.duraping.util.DurabilityCalc;
-import com.redkey.duraping.util.ItemKey;
+import sh.redkey.mc.duraping.config.ConfigManager;
+import sh.redkey.mc.duraping.config.DuraPingConfig;
+import sh.redkey.mc.duraping.hud.HudFlashOverlay;
+import sh.redkey.mc.duraping.keybind.Keybinds;
+import sh.redkey.mc.duraping.sound.ModSounds;
+import sh.redkey.mc.duraping.util.DurabilityCalc;
+import sh.redkey.mc.duraping.util.ItemKey;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;

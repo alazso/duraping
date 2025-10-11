@@ -1,4 +1,4 @@
-package com.redkey.duraping.hud;
+package sh.redkey.mc.duraping.hud;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;

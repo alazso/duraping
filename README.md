@@ -33,8 +33,8 @@ DuraPing is a client-side quality-of-life mod that helps you never break your fa
 
 ### Requirements
 - **Minecraft**: 1.21.9
-- **Fabric Loader**: 0.16.9 or higher
-- **Fabric API**: 0.111.0+1.21.9 or higher
+- **Fabric Loader**: 0.17.3 or higher
+- **Fabric API**: 0.134.0+1.21.9 or higher
 - **Java**: 21 or higher
 
 ### Optional Dependencies

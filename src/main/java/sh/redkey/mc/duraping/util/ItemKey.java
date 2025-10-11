@@ -1,4 +1,4 @@
-package com.redkey.duraping.util;
+package sh.redkey.mc.duraping.util;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;

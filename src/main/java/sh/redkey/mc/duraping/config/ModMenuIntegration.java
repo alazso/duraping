@@ -1,4 +1,4 @@
-package com.redkey.duraping.config;
+package sh.redkey.mc.duraping.config;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

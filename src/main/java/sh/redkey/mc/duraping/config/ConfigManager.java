@@ -1,4 +1,4 @@
-package com.redkey.duraping.config;
+package sh.redkey.mc.duraping.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

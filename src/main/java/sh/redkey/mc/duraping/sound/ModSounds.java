@@ -1,6 +1,6 @@
-package com.redkey.duraping.sound;
+package sh.redkey.mc.duraping.sound;
 
-import com.redkey.duraping.DuraPingClient;
+import sh.redkey.mc.duraping.DuraPingClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
