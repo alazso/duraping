@@ -1,8 +1,12 @@
 # DuraPing
 
-[![CI](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&logo=github&style=for-the-badge&label=CI)](https://github.com/redlynxlabs/duraping/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?logo=github&style=for-the-badge&label=Release)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
-[![License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
+[![release](https://img.shields.io/github/v/release/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/releases)
+[![BUILD](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&logo=github&style=for-the-badge&label=BUILD)](https://github.com/redlynxlabs/duraping/actions/workflows/ci.yml)
+![GitHub License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)
+
+[![modrinth](https://img.shields.io/badge/-modrinth-gray?style=for-the-badge&labelColor=green&labelWidth=15&logo=appveyor&logoColor=white)](https://modrinth.com/mod/duraping)
+[![curseforge](https://img.shields.io/badge/-CurseForge-gray?style=for-the-badge&logo=curseforge&labelColor=white)](https://www.curseforge.com/minecraft/mc-mods/duraping)
+[![discord](https://img.shields.io/discord/1402745018682179624?label=hologram&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/hologram)
 
 **Lightweight durability alerts for Minecraft 1.21.9 (Fabric)**
 
