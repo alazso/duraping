@@ -1,0 +1,105 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for DuraPing
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Describe what you're trying to accomplish.
+      placeholder: I'm always frustrated when... / It would be helpful if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented.
+      placeholder: Add a new alert type that... / Allow configuration of...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: I could use another mod, but... / Manually checking durability works but...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - Alert system (new alert types, thresholds, etc.)
+        - Configuration (new settings, UI improvements)
+        - Keybindings (new hotkeys, controls)
+        - Visual effects (HUD, overlays, colors)
+        - Audio (new sounds, volume controls)
+        - Item handling (specific item support, filters)
+        - Performance (optimizations, efficiency)
+        - Compatibility (mod integrations, version support)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low (nice to have)
+        - Medium (would improve experience)
+        - High (significantly impacts usability)
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or Mockups
+      description: |
+        If applicable, add screenshots, mockups, or examples from other mods.
+        You can drag and drop images here.
+    validations:
+      required: false
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation Notes
+      description: If you have technical knowledge, suggest how this might be implemented.
+      placeholder: This could be done by adding a new config field... / A mixin to...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, use cases, or information about the feature request.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: Compatibility Considerations
+      description: Check any that apply
+      options:
+        - label: This should work on both client and server
+        - label: This should remain client-only
+        - label: This may require server-side changes
+        - label: This may conflict with other mods
+
