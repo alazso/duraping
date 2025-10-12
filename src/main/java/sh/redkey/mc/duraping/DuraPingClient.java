@@ -70,7 +70,11 @@ public class DuraPingClient implements ClientModInitializer {
                 DuraPingConfig cfg = DuraPingConfig.get();
                 cfg.enabled = !cfg.enabled;
                 ConfigManager.save();
-                toast("DuraPing " + (cfg.enabled ? "Enabled" : "Disabled"));
+                // More visible feedback with color
+                var msg = Text.literal("DuraPing: " + (cfg.enabled ? "ENABLED" : "DISABLED"))
+                        .styled(style -> style.withColor(cfg.enabled ? 0x55FF55 : 0xFF5555).withBold(true));
+                MC.inGameHud.setOverlayMessage(msg, false);
+                if (MC.player != null) MC.player.sendMessage(msg, false);
             }, () -> {
                 snoozeUntil = System.currentTimeMillis() + (5 * 60_000L);
                 toast("DuraPing snoozed for 5m");
