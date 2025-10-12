@@ -23,7 +23,7 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setSaveConsumer(v -> cfg.sound = v).build());
             general.addEntry(entry.startBooleanToggle(Text.literal("Screen Flash"), cfg.flash)
                     .setSaveConsumer(v -> cfg.flash = v).build());
-            general.addEntry(entry.startBooleanToggle(Text.literal("Toast Alerts"), cfg.toast)
+            general.addEntry(entry.startBooleanToggle(Text.literal("Toast Alerts (Hotbar)"), cfg.toast)
                     .setSaveConsumer(v -> cfg.toast = v).build());
             general.addEntry(entry.startBooleanToggle(Text.literal("Elytra Flight Guard"), cfg.elytraGuard)
                     .setTooltip(Text.literal("Extra warning when attempting to fly with critically low elytra"))
@@ -50,10 +50,10 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Text.literal("Minimum time between warn alerts for the same item (30000 = 30s)"))
                     .setMin(0L).setSaveConsumer(v -> cfg.warnCooldownMs = v).build());
             cooldowns.addEntry(entry.startLongField(Text.literal("Danger Cooldown (ms)"), cfg.dangerCooldownMs)
-                    .setTooltip(Text.literal("Minimum time between danger alerts for the same item (45000 = 45s)"))
+                    .setTooltip(Text.literal("Minimum time between danger alerts for the same item (15000 = 15s)"))
                     .setMin(0L).setSaveConsumer(v -> cfg.dangerCooldownMs = v).build());
             cooldowns.addEntry(entry.startLongField(Text.literal("Critical Cooldown (ms)"), cfg.criticalCooldownMs)
-                    .setTooltip(Text.literal("Minimum time between critical alerts for the same item (10000 = 10s)"))
+                    .setTooltip(Text.literal("Minimum time between critical alerts for the same item (7000 = 7s)"))
                     .setMin(0L).setSaveConsumer(v -> cfg.criticalCooldownMs = v).build());
 
             // Activity-Aware Category
@@ -70,6 +70,17 @@ public class ModMenuIntegration implements ModMenuApi {
             activity.addEntry(entry.startBooleanToggle(Text.literal("Quiet Below Warn"), cfg.quietBelowWarn)
                     .setTooltip(Text.literal("In warn bucket, only show visual alerts after first crossing (no sound/chat)"))
                     .setSaveConsumer(v -> cfg.quietBelowWarn = v).build());
+
+            // Keybinds Info Category
+            var keybinds = builder.getOrCreateCategory(Text.literal("Keybinds"));
+            keybinds.addEntry(entry.startTextDescription(
+                    Text.literal("§6DuraPing Keybinds (defaults):§r\n\n" +
+                            "§e• Numpad 7§r - Toggle DuraPing on/off\n" +
+                            "§e• Numpad 8§r - Snooze alerts for 5 minutes\n" +
+                            "§e• Numpad 9§r - Show current hand durability\n\n" +
+                            "§7To rebind these keys, go to:\n" +
+                            "Options → Controls → DuraPing§r")
+            ).build());
 
             builder.setSavingRunnable(ConfigManager::save);
             return builder.build();
