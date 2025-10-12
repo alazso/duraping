@@ -24,8 +24,8 @@ body:
       description: Steps to reproduce the behavior.
       placeholder: |
         1. Launch Minecraft with DuraPing installed
-        2. Equip a diamond pickaxe
-        3. Mine blocks until durability is low
+        2. Equip a low durability item
+        3. Use the item until durability threshold is reached
         4. Observe error
     validations:
       required: true
@@ -62,7 +62,7 @@ body:
     attributes:
       label: DuraPing Version
       description: What version of DuraPing are you using?
-      placeholder: "0.3.1"
+      placeholder: "0.1.0"
     validations:
       required: true
 
