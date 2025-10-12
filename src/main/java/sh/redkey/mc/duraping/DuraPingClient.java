@@ -44,28 +44,8 @@ public class DuraPingClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) return;
-            if (!DuraPingConfig.get().enabled) return;
-            if (System.currentTimeMillis() < snoozeUntil) return;
 
-            // Track "work mode" (continuous block breaking)
-            if (client.interactionManager != null && client.interactionManager.isBreakingBlock()) {
-                breakingTicks++;
-            } else {
-                breakingTicks = 0;
-            }
-
-            // Hands
-            checkStack(ItemKey.of(client.player.getMainHandStack()), null);
-            checkStack(ItemKey.of(client.player.getOffHandStack()), null);
-
-            // Armor
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR) continue;
-                ItemStack st = client.player.getEquippedStack(slot);
-                checkStack(ItemKey.of(st), slot);
-            }
-
-            // Keybinds
+            // Keybinds - handle BEFORE enabled check so they always work
             Keybinds.tick(() -> {
                 DuraPingConfig cfg = DuraPingConfig.get();
                 cfg.enabled = !cfg.enabled;
@@ -102,6 +82,28 @@ public class DuraPingClient implements ClientModInitializer {
                     toast(h.getName().getString() + ": " + left + " (" + pct + "%)");
                 }
             });
+
+            // Master toggle and snooze checks - return early if alerts disabled
+            if (!DuraPingConfig.get().enabled) return;
+            if (System.currentTimeMillis() < snoozeUntil) return;
+
+            // Track "work mode" (continuous block breaking)
+            if (client.interactionManager != null && client.interactionManager.isBreakingBlock()) {
+                breakingTicks++;
+            } else {
+                breakingTicks = 0;
+            }
+
+            // Hands
+            checkStack(ItemKey.of(client.player.getMainHandStack()), null);
+            checkStack(ItemKey.of(client.player.getOffHandStack()), null);
+
+            // Armor
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR) continue;
+                ItemStack st = client.player.getEquippedStack(slot);
+                checkStack(ItemKey.of(st), slot);
+            }
         });
     }
 
