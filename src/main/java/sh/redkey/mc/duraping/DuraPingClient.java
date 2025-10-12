@@ -76,8 +76,22 @@ public class DuraPingClient implements ClientModInitializer {
                 MC.inGameHud.setOverlayMessage(msg, false);
                 if (MC.player != null) MC.player.sendMessage(msg, false);
             }, () -> {
-                snoozeUntil = System.currentTimeMillis() + (5 * 60_000L);
-                toast("DuraPing snoozed for 5m");
+                long now = System.currentTimeMillis();
+                if (now < snoozeUntil) {
+                    // Already snoozed - cancel it
+                    snoozeUntil = 0;
+                    var msg = Text.literal("DuraPing: Snooze CANCELLED")
+                            .styled(style -> style.withColor(0x55FF55).withBold(true));
+                    MC.inGameHud.setOverlayMessage(msg, false);
+                    if (MC.player != null) MC.player.sendMessage(msg, false);
+                } else {
+                    // Not snoozed - activate snooze
+                    snoozeUntil = now + (5 * 60_000L);
+                    var msg = Text.literal("DuraPing: Snoozed for 5 minutes")
+                            .styled(style -> style.withColor(0xFFAA00).withBold(true));
+                    MC.inGameHud.setOverlayMessage(msg, false);
+                    if (MC.player != null) MC.player.sendMessage(msg, false);
+                }
             }, () -> {
                 ItemStack h = client.player.getMainHandStack();
                 if (h.isEmpty() || !h.isDamageable()) {

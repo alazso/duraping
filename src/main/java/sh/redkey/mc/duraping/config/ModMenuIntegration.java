@@ -76,7 +76,7 @@ public class ModMenuIntegration implements ModMenuApi {
             keybinds.addEntry(entry.startTextDescription(
                     Text.literal("§6DuraPing Keybinds (defaults):§r\n\n" +
                             "§e• Numpad 7§r - Toggle DuraPing on/off\n" +
-                            "§e• Numpad 8§r - Snooze alerts for 5 minutes\n" +
+                            "§e• Numpad 8§r - Snooze for 5 min / Cancel snooze\n" +
                             "§e• Numpad 9§r - Show current hand durability\n\n" +
                             "§7To rebind these keys, go to:\n" +
                             "Options → Controls → DuraPing§r")
