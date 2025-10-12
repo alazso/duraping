@@ -27,7 +27,6 @@
   },
   "mixins": [
     "duraping.mixins.json"
-  ],
-  "accessWidener": null
+  ]
 }
 

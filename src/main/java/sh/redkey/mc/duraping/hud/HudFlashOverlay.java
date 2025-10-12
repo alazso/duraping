@@ -3,6 +3,7 @@ package sh.redkey.mc.duraping.hud;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 
 public class HudFlashOverlay implements HudRenderCallback {
     private static float alpha = 0f;
@@ -14,7 +15,7 @@ public class HudFlashOverlay implements HudRenderCallback {
     }
 
     @Override
-    public void onHudRender(DrawContext ctx, float tickDelta) {
+    public void onHudRender(DrawContext ctx, RenderTickCounter tickCounter) {
         if (System.currentTimeMillis() > until) return;
         var mc = MinecraftClient.getInstance();
         if (mc == null || mc.getWindow() == null) return;

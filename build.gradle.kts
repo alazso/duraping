@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom") version "1.8-SNAPSHOT"
+    id("fabric-loom") version "1.11-SNAPSHOT"
     id("pl.allegro.tech.build.axion-release") version "1.18.15"
     java
 }

@@ -47,7 +47,7 @@ public class DuraPingClient implements ClientModInitializer {
 
             // Armor
             for (EquipmentSlot slot : EquipmentSlot.values()) {
-                if (!slot.getType().equals(EquipmentSlot.Type.ARMOR)) continue;
+                if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR) continue;
                 ItemStack st = client.player.getEquippedStack(slot);
                 checkStack(ItemKey.of(st), slot);
             }
