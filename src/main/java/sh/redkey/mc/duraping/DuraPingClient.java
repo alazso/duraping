@@ -141,7 +141,10 @@ public class DuraPingClient implements ClientModInitializer {
         boolean cooldownOk = (now - st.lastAlertAt) >= bucketCooldown;
 
         // Alert only on downward crossing when armed, OR (optionally) rate-limited repeats in same bucket.
+        // Critical bucket (3) ALWAYS repeats on cooldown for safety, regardless of armed status
         boolean shouldAlert = (crossedDown && st.armed) || (sameBucket && st.armed && cooldownOk && bucket > 1);
+        // Critical bucket override: always repeat on cooldown even if disarmed (safety critical)
+        if (sameBucket && bucket == 3 && cooldownOk) shouldAlert = true;
         // For warn bucket repeats, make it very conservative:
         if (sameBucket && bucket == 1) shouldAlert = st.armed && cooldownOk && breakingTicks < cfg.workTicksThreshold;
 
