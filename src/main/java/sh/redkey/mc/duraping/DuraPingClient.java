@@ -169,9 +169,19 @@ public class DuraPingClient implements ClientModInitializer {
         if (shouldAlert && (System.currentTimeMillis() >= snoozeUntil)) {
             // fire full alert
             boolean critical = (bucket == 3);
-            if (cfg.chat)   MC.player.sendMessage(critical
-                    ? Text.translatable("text.duraping.critical", key.displayName(), left)
-                    : Text.translatable("text.duraping.warn",     key.displayName(), left), false);
+            boolean danger = (bucket == 2);
+            
+            if (cfg.chat) {
+                var msg = switch (bucket) {
+                    case 3 -> Text.translatable("text.duraping.critical", key.displayName(), left)
+                            .styled(style -> style.withColor(0xAA0000).withBold(true)); // Dark red + bold
+                    case 2 -> Text.translatable("text.duraping.danger", key.displayName(), left)
+                            .styled(style -> style.withColor(0xFF5555)); // Red/orange
+                    default -> Text.translatable("text.duraping.warn", key.displayName(), left)
+                            .styled(style -> style.withColor(0xFFAA00)); // Gold/yellow
+                };
+                MC.player.sendMessage(msg, false);
+            }
             if (cfg.sound)  MC.player.playSound(critical ? ModSounds.CRITICAL : ModSounds.WARN, 1.0F, 1.0F);
             if (cfg.flash)  HudFlashOverlay.flash(critical ? 0.55f : 0.30f);
             if (cfg.toast)  toast((critical ? "CRITICAL " : "Low ") + key.displayName());

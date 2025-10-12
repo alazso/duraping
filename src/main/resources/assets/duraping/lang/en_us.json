@@ -1,5 +1,6 @@
 {
   "text.duraping.warn": "%s is getting low (%s uses left)",
+  "text.duraping.danger": "%s is in DANGER (%s uses left)",
   "text.duraping.critical": "%s is CRITICAL (%s uses left)",
   "key.duraping.toggle": "DuraPing: Toggle",
   "key.duraping.snooze": "DuraPing: Snooze 5m",
