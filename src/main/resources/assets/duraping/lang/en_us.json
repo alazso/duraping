@@ -2,9 +2,10 @@
   "text.duraping.warn": "%s is getting low (%s uses left)",
   "text.duraping.danger": "%s is in DANGER (%s uses left)",
   "text.duraping.critical": "%s is CRITICAL (%s uses left)",
-  "key.duraping.toggle": "DuraPing: Toggle",
-  "key.duraping.snooze": "DuraPing: Snooze 5m",
-  "key.duraping.show": "DuraPing: Show Hand Durability",
+  "key.duraping.toggle": "Toggle DuraPing",
+  "key.duraping.snooze": "Snooze Alerts (5m)",
+  "key.duraping.show": "Show Hand Durability",
+  "key.category.duraping.keybinds": "DuraPing",
   "category.duraping": "DuraPing"
 }
 
