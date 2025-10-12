@@ -56,6 +56,7 @@ public class DuraPingClient implements ClientModInitializer {
                 MC.inGameHud.setOverlayMessage(msg, false);
                 if (MC.player != null) MC.player.sendMessage(msg, false);
             }, () -> {
+                DuraPingConfig cfg = DuraPingConfig.get();
                 long now = System.currentTimeMillis();
                 if (now < snoozeUntil) {
                     // Already snoozed - cancel it
@@ -66,8 +67,9 @@ public class DuraPingClient implements ClientModInitializer {
                     if (MC.player != null) MC.player.sendMessage(msg, false);
                 } else {
                     // Not snoozed - activate snooze
-                    snoozeUntil = now + (5 * 60_000L);
-                    var msg = Text.literal("DuraPing: Snoozed for 5 minutes")
+                    int minutes = Math.max(1, cfg.snoozeDurationMinutes); // Minimum 1 minute
+                    snoozeUntil = now + (minutes * 60_000L);
+                    var msg = Text.literal("DuraPing: Snoozed for " + minutes + " minute" + (minutes == 1 ? "" : "s"))
                             .styled(style -> style.withColor(0xFFAA00).withBold(true));
                     MC.inGameHud.setOverlayMessage(msg, false);
                     if (MC.player != null) MC.player.sendMessage(msg, false);
@@ -147,15 +149,15 @@ public class DuraPingClient implements ClientModInitializer {
 
         long now = System.currentTimeMillis();
         long bucketCooldown = switch (bucket) {
-            case 3 -> cfg.criticalCooldownMs;
-            case 2 -> cfg.dangerCooldownMs;
-            case 1 -> cfg.warnCooldownMs;
+            case 3 -> cfg.criticalCooldownSec * 1000L;
+            case 2 -> cfg.dangerCooldownSec * 1000L;
+            case 1 -> cfg.warnCooldownSec * 1000L;
             default -> 0L;
         };
 
         // Activity-aware suppression for warn/danger (not for critical)
         if (cfg.activityAware && breakingTicks >= cfg.workTicksThreshold && (bucket == 1 || bucket == 2)) {
-            bucketCooldown = Math.max(bucketCooldown, cfg.workCooldownMs);
+            bucketCooldown = Math.max(bucketCooldown, cfg.workCooldownSec * 1000L);
         }
 
         boolean cooldownOk = (now - st.lastAlertAt) >= bucketCooldown;

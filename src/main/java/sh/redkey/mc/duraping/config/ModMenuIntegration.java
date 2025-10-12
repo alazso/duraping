@@ -28,6 +28,9 @@ public class ModMenuIntegration implements ModMenuApi {
             general.addEntry(entry.startBooleanToggle(Text.literal("Elytra Flight Guard"), cfg.elytraGuard)
                     .setTooltip(Text.literal("Extra warning when attempting to fly with critically low elytra"))
                     .setSaveConsumer(v -> cfg.elytraGuard = v).build());
+            general.addEntry(entry.startIntField(Text.literal("Snooze Duration (minutes)"), cfg.snoozeDurationMinutes)
+                    .setTooltip(Text.literal("How long to snooze alerts when using the snooze keybind"))
+                    .setMin(1).setMax(60).setSaveConsumer(v -> cfg.snoozeDurationMinutes = v).build());
 
             // Thresholds Category
             var thresholds = builder.getOrCreateCategory(Text.literal("Thresholds"));
@@ -46,15 +49,15 @@ public class ModMenuIntegration implements ModMenuApi {
 
             // Cooldowns Category
             var cooldowns = builder.getOrCreateCategory(Text.literal("Cooldowns"));
-            cooldowns.addEntry(entry.startLongField(Text.literal("Warn Cooldown (ms)"), cfg.warnCooldownMs)
-                    .setTooltip(Text.literal("Minimum time between warn alerts for the same item (30000 = 30s)"))
-                    .setMin(0L).setSaveConsumer(v -> cfg.warnCooldownMs = v).build());
-            cooldowns.addEntry(entry.startLongField(Text.literal("Danger Cooldown (ms)"), cfg.dangerCooldownMs)
-                    .setTooltip(Text.literal("Minimum time between danger alerts for the same item (15000 = 15s)"))
-                    .setMin(0L).setSaveConsumer(v -> cfg.dangerCooldownMs = v).build());
-            cooldowns.addEntry(entry.startLongField(Text.literal("Critical Cooldown (ms)"), cfg.criticalCooldownMs)
-                    .setTooltip(Text.literal("Minimum time between critical alerts for the same item (7000 = 7s)"))
-                    .setMin(0L).setSaveConsumer(v -> cfg.criticalCooldownMs = v).build());
+            cooldowns.addEntry(entry.startIntField(Text.literal("Warn Cooldown (seconds)"), cfg.warnCooldownSec)
+                    .setTooltip(Text.literal("Minimum time between warn alerts for the same item"))
+                    .setMin(0).setMax(300).setSaveConsumer(v -> cfg.warnCooldownSec = v).build());
+            cooldowns.addEntry(entry.startIntField(Text.literal("Danger Cooldown (seconds)"), cfg.dangerCooldownSec)
+                    .setTooltip(Text.literal("Minimum time between danger alerts for the same item"))
+                    .setMin(0).setMax(300).setSaveConsumer(v -> cfg.dangerCooldownSec = v).build());
+            cooldowns.addEntry(entry.startIntField(Text.literal("Critical Cooldown (seconds)"), cfg.criticalCooldownSec)
+                    .setTooltip(Text.literal("Minimum time between critical alerts for the same item"))
+                    .setMin(0).setMax(60).setSaveConsumer(v -> cfg.criticalCooldownSec = v).build());
 
             // Activity-Aware Category
             var activity = builder.getOrCreateCategory(Text.literal("Activity-Aware"));
@@ -64,9 +67,9 @@ public class ModMenuIntegration implements ModMenuApi {
             activity.addEntry(entry.startIntField(Text.literal("Work Ticks Threshold"), cfg.workTicksThreshold)
                     .setTooltip(Text.literal("How many ticks of continuous mining before suppression kicks in (20 = 1s)"))
                     .setMin(1).setMax(100).setSaveConsumer(v -> cfg.workTicksThreshold = v).build());
-            activity.addEntry(entry.startLongField(Text.literal("Work Cooldown (ms)"), cfg.workCooldownMs)
-                    .setTooltip(Text.literal("Extended cooldown during mining (120000 = 2 minutes)"))
-                    .setMin(0L).setSaveConsumer(v -> cfg.workCooldownMs = v).build());
+            activity.addEntry(entry.startIntField(Text.literal("Work Cooldown (seconds)"), cfg.workCooldownSec)
+                    .setTooltip(Text.literal("Extended cooldown during continuous mining"))
+                    .setMin(0).setMax(600).setSaveConsumer(v -> cfg.workCooldownSec = v).build());
             activity.addEntry(entry.startBooleanToggle(Text.literal("Quiet Below Warn"), cfg.quietBelowWarn)
                     .setTooltip(Text.literal("In warn bucket, only show visual alerts after first crossing (no sound/chat)"))
                     .setSaveConsumer(v -> cfg.quietBelowWarn = v).build());

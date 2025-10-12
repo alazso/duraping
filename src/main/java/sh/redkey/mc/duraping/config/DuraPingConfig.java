@@ -25,19 +25,22 @@ public class DuraPingConfig {
     // Set > 0 for: Mending with XP orbs, modded durability regen, or rapid item swapping.
     public int hysteresisPct = 0;
 
-    // Cooldowns per severity (milliseconds) for same item/slot while in the same bucket.
-    public long warnCooldownMs = 30_000L;     // 30s
-    public long dangerCooldownMs = 15_000L;   // 15s
-    public long criticalCooldownMs = 7_000L; // 7s
+    // Cooldowns per severity (seconds) for same item/slot while in the same bucket.
+    public int warnCooldownSec = 30;
+    public int dangerCooldownSec = 15;
+    public int criticalCooldownSec = 7;
 
     // When the player is holding left click and continuously breaking blocks,
     // suppress repeat warn/danger pings for longer to avoid spam.
     public boolean activityAware = true;
     public int workTicksThreshold = 40;       // ~2s of continuous mining
-    public long workCooldownMs = 30_000L;    // 2 minutes for warn/danger
+    public int workCooldownSec = 30;
 
     // Optional: suppress repeated alerts in warn bucket except for first crossing
     public boolean quietBelowWarn = false;
+
+    // Snooze duration in minutes
+    public int snoozeDurationMinutes = 5;
 
     public Map<String, Thresholds> overrides = new HashMap<>();
 
