@@ -1,8 +1,9 @@
 # DuraPing
 
-[![CI](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&logo=github&style=for-the-badge&label=CI)](https://github.com/redlynxlabs/duraping/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?logo=github&style=for-the-badge&label=Release)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/build.yml?branch=main&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/redlynxlabs/duraping?logo=github&style=for-the-badge&label=Latest)](https://github.com/redlynxlabs/duraping/releases/latest)
 [![License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
+[![Discord](https://img.shields.io/discord/1402745018682179624?label=discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/hologram)
 
 **Lightweight durability alerts for Minecraft 1.21.9 (Fabric)**
 
@@ -113,7 +114,7 @@ No server-side installation or permissions required.
 git clone https://github.com/redlynxlabs/duraping.git
 cd duraping
 ./gradlew build
-# Output: build/libs/DuraPing-<version>.jar
+# Output: build/libs/duraping-v<version>-1.21.9.jar
 ```
 
 ### Branching Strategy
