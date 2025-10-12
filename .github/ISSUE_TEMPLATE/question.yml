@@ -29,9 +29,9 @@ body:
       options:
         - Installation and setup
         - Configuration and settings
-        - Keybindings and controls
+        - Alert types and thresholds
         - Compatibility with other mods
-        - Alert behavior and thresholds
+        - Keybindings and controls
         - Performance or technical details
         - Mod Menu integration
         - Other

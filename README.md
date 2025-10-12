@@ -1,12 +1,9 @@
 # DuraPing
 
-[![release](https://img.shields.io/github/v/release/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/releases)
-[![BUILD](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&logo=github&style=for-the-badge&label=BUILD)](https://github.com/redlynxlabs/duraping/actions/workflows/ci.yml)
-![GitHub License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)
-
-[![modrinth](https://img.shields.io/badge/-modrinth-gray?style=for-the-badge&labelColor=green&labelWidth=15&logo=appveyor&logoColor=white)](https://modrinth.com/mod/duraping)
-[![curseforge](https://img.shields.io/badge/-CurseForge-gray?style=for-the-badge&logo=curseforge&labelColor=white)](https://www.curseforge.com/minecraft/mc-mods/duraping)
-[![discord](https://img.shields.io/discord/1402745018682179624?label=hologram&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/hologram)
+[![Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/build.yml?branch=main&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/redlynxlabs/duraping?logo=github&style=for-the-badge&label=Latest)](https://github.com/redlynxlabs/duraping/releases/latest)
+[![License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
+[![Discord](https://img.shields.io/discord/1402745018682179624?label=discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/hologram)
 
 **Lightweight durability alerts for Minecraft 1.21.9 (Fabric)**
 
@@ -117,7 +114,7 @@ No server-side installation or permissions required.
 git clone https://github.com/redlynxlabs/duraping.git
 cd duraping
 ./gradlew build
-# Output: build/libs/DuraPing-<version>.jar
+# Output: build/libs/duraping-v<version>-1.21.9.jar
 ```
 
 ### Branching Strategy
