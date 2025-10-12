@@ -1,3 +1,5 @@
+import org.gradle.jvm.tasks.Jar
+
 plugins {
     id("fabric-loom") version "1.11-SNAPSHOT"
     id("pl.allegro.tech.build.axion-release") version "1.18.15"
@@ -15,6 +17,8 @@ scmVersion {
 group = property("maven_group")!!
 version = scmVersion.version
 
+val minecraftVersion: String by project
+
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(property("java_version").toString()))
     withSourcesJar()
@@ -28,7 +32,6 @@ repositories {
 }
 
 dependencies {
-    val minecraftVersion = property("minecraft_version") as String
     val yarnMappings = property("yarn_mappings") as String
     val loaderVersion = property("loader_version") as String
     val fabricApiVersion = property("fabric_api_version") as String
@@ -60,5 +63,18 @@ scmVersion {
 
 tasks.jar {
     from("LICENSE") { rename { "${it}_${project.property("mod_name")}" } }
+    archiveBaseName.set("duraping")
+    archiveVersion.set("v${version}-${minecraftVersion}")
+}
+
+tasks.named<Jar>("remapJar") {
+    archiveBaseName.set("duraping")
+    archiveVersion.set("v${version}-${minecraftVersion}")
+}
+
+tasks.named<Jar>("sourcesJar") {
+    archiveBaseName.set("duraping")
+    archiveVersion.set("v${version}-${minecraftVersion}")
+    archiveClassifier.set("sources")
 }
 
