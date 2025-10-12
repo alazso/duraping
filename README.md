@@ -132,12 +132,12 @@ git checkout main
 git merge dev
 git push origin main
 
-# 2. Create version tag (choose one)
-git tag -a v0.2.0 -m "Release 0.2.0"  # Minor version
-git tag -a v0.1.1 -m "Release 0.1.1"  # Patch version
-git tag -a v1.0.0 -m "Release 1.0.0"  # Major version
+# 2. Create signed version tag
+git tag -s -a v0.2.0 -m "Release 0.2.0"  # Minor version
+git tag -s -a v0.1.1 -m "Release 0.1.1"  # Patch version
+git tag -s -a v1.0.0 -m "Release 1.0.0"  # Major version
 
-# 3. Push the tag to trigger release workflow
+# 3. Push the signed tag to trigger release workflow
 git push origin v0.2.0
 ```
 
