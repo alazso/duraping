@@ -1,33 +1,33 @@
 # DuraPing
 
-[![CI](https://github.com/redkey-labs/duraping/actions/workflows/ci.yml/badge.svg)](https://github.com/redkey-labs/duraping/actions/workflows/ci.yml)
-[![Release](https://github.com/redkey-labs/duraping/actions/workflows/release.yml/badge.svg)](https://github.com/redkey-labs/duraping/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/redkeysh/duraping/actions/workflows/ci.yml/badge.svg)](https://github.com/redkey-labs/duraping/actions/workflows/ci.yml)
+[![Release](https://github.com/redkeysh/duraping/actions/workflows/release.yml/badge.svg)](https://github.com/redkey-labs/duraping/actions/workflows/release.yml)
+[![License: GNU GPLv3](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Lightweight durability alerts for Minecraft 1.21.9 (Fabric)**
 
-DuraPing is a client-side quality-of-life mod that helps you never break your favorite tools, armor, or elytra again. Get timely alerts through chat, sound, screen flash, or toast notifications when your gear is running low on durability.
+DuraPing is a client-side quality-of-life mod that helps you never break your favorite tools, armor, or elytra again. Get timely alerts through chat, sound, screen flash, or toast (hotbar) notifications when your gear is running low on durability.
 
 ## Features
 
 ### Core Alerts
-- 🔔 **Multi-tier threshold system**: Warn (25%), Danger (10%), Critical (5%), and 1-durability emergency alerts
-- 💬 **Chat notifications**: Discrete in-game messages with item name and remaining uses
-- 🔊 **Custom sounds**: Subtle audio cues (warning and critical) with subtitle support
-- ⚡ **Screen flash**: Brief, low-opacity vignette overlay for visual alerts
-- 🍞 **Toast notifications**: Optional advancement-style pop-ups
+- **Multi-tier threshold system**: Warn (25%), Danger (10%), Critical (5%), and 1-durability emergency alerts
+- **Chat notifications**: Discrete in-game messages with item name and remaining uses
+- **Custom sounds**: Subtle audio cues (warning and critical) with subtitle support
+- **Screen flash**: Brief, low-opacity vignette overlay for visual alerts
+- **Toast notifications**: Optional advancement-style pop-ups
 
 ### Smart Monitoring
-- 🎯 **All equipment slots**: Main hand, offhand, and all armor pieces
-- 🚫 **Spam prevention**: Debounced alerts with configurable cooldowns (default: 10s)
-- 🎚️ **One-shot threshold crossing**: Alerts trigger only when durability crosses a threshold downward
-- ⚙️ **Per-item overrides**: Customize thresholds for specific items (e.g., elytra at 15%)
+- **All equipment slots**: Main hand, offhand, and all armor pieces
+- **Spam prevention**: Debounced alerts with configurable cooldowns (default: 10s)
+- **One-shot threshold crossing**: Alerts trigger only when durability crosses a threshold downward
+- **Per-item overrides**: Customize thresholds for specific items (e.g., elytra at 15%)
 
 ### Quality of Life
-- ✈️ **Elytra flight guard**: Extra warning when attempting to fly with critically low elytra
-- ⌨️ **Keybinds**: Toggle alerts, snooze for 5 minutes, or check current item durability on demand
-- 🎨 **Mod Menu integration**: Clean Cloth Config GUI for all settings
-- 🌐 **Client-only**: No server-side mod required; works on vanilla servers
+- **Elytra flight guard**: Extra warning when attempting to fly with critically low elytra
+- **Keybinds**: Toggle alerts, snooze for 5 minutes, or check current item durability on demand
+- **Mod Menu integration**: Clean Cloth Config GUI for all settings
+- **Client-only**: No server-side mod required; works on vanilla servers
 
 ## Installation
 
@@ -99,12 +99,12 @@ Add entries to `overrides` using the namespaced item ID:
 
 ## Multiplayer & Server Compatibility
 
-✅ **Fully client-side** — Works on:
+**Fully client-side** — Works on:
 - Vanilla servers
 - Modded servers (without DuraPing installed)
 - Singleplayer
 
-No server-side installation or permissions required. DuraPing never sends network packets.
+No server-side installation or permissions required.
 
 ## Development
 
@@ -141,12 +141,6 @@ git tag -a v1.0.0 -m "Release 1.0.0"  # Major version
 git push origin v0.2.0
 ```
 
-GitHub Actions will:
-1. Detect the `v*.*.*` tag
-2. Build the mod JAR with versioned filename
-3. Create GitHub Release with changelog
-4. Attach JAR to the release
-
 ### Commit Convention
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
@@ -162,7 +156,6 @@ docs: clarify per-item override syntax
 - [ ] **Sound pack support**: Let users provide custom alert sounds
 - [ ] **Per-slot thresholds**: Different thresholds for armor vs. tools
 - [ ] **Durability HUD**: Optional on-screen durability overlay
-- [ ] **MultiMC/Prism config**: Pre-configured instance export
 
 ## Contributing
 
@@ -174,13 +167,9 @@ Contributions welcome! Please:
 
 ## License
 
-[MIT License](LICENSE) — Free to use, modify, and distribute.
+[GNU GPLv3](LICENSE) — Free to use, modify, and distribute.
 
 ## Credits
 
-- **Author**: [redkey](https://github.com/redkey-labs)
+- **Author**: [redkey](https://github.com/redkeysh)
 - Built with [Fabric](https://fabricmc.net/), [Cloth Config](https://github.com/shedaniel/cloth-config), and [Mod Menu](https://github.com/TerraformersMC/ModMenu)
-
----
-
-**Never lose your Netherite again!** ⛏️✨

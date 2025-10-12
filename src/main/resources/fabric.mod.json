@@ -6,9 +6,9 @@
   "description": "Lightweight durability alerts with sound/chat/toast/flash. Client-only QoL.",
   "authors": ["redkey"],
   "contact": {
-    "sources": "https://github.com/redkey-labs/duraping"
+    "sources": "https://github.com/redkeysh/duraping"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "icon": "assets/duraping/icon.png",
   "environment": "client",
   "entrypoints": {
