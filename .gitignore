@@ -3,9 +3,10 @@
 build/
 out/
 
-# Idea
+# IDE
 .idea/
 *.iml
+.vscode/
 
 # OS
 .DS_Store
