@@ -118,6 +118,37 @@ public class DuraPingClient implements ClientModInitializer {
         int left = Math.max(0, max - key.stack().getDamage());
         int pct = (int)Math.floor((left * 100.0) / max);
 
+        // === EMERGENCY 2-DURABILITY ALERT (bypasses snooze) ===
+        if (left == 2) {
+            String k = keyFor(key, slot);
+            var st = stateByKey.computeIfAbsent(k, _k -> new AlertState());
+            long now = System.currentTimeMillis();
+            
+            // Only fire once per item (when crossing into 2-durability, or if not yet tracked)
+            // Check if we haven't alerted for 2-durability yet (lastPct will be different)
+            boolean shouldEmergencyAlert = (st.lastBucket == 0 || st.lastPct > pct);
+            
+            if (shouldEmergencyAlert) {
+                // Emergency alert format
+                var emergencyMsg = Text.literal("---------------------------------------------\n")
+                        .append(Text.literal("EMERGENCY: CRITICAL 2 DURABILITY\n").styled(style -> style.withColor(0xAA0000).withBold(true)))
+                        .append(Text.literal(key.displayName() + " - " + left + " uses left\n").styled(style -> style.withColor(0xFF5555)))
+                        .append(Text.literal("---------------------------------------------"));
+                
+                if (cfg.chat && MC.player != null) MC.player.sendMessage(emergencyMsg, false);
+                if (cfg.toast) {
+                    toast("⚠ EMERGENCY: " + key.displayName() + " - 2 DURABILITY");
+                }
+                if (cfg.sound && MC.player != null) {
+                    // Play critical sound 3 times in succession with varying pitch
+                    MC.player.playSound(ModSounds.CRITICAL, 1.0F, 1.0F);
+                    MC.player.playSound(ModSounds.CRITICAL, 1.0F, 1.2F);
+                    MC.player.playSound(ModSounds.CRITICAL, 1.0F, 0.8F);
+                }
+                if (cfg.flash) HudFlashOverlay.flash(0.75f); // Max intensity flash
+            }
+        }
+
         var th = cfg.thresholdsFor(key.id());
         int bucket =
                 (left <= 1)               ? 3 :
