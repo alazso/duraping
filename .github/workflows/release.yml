@@ -3,29 +3,51 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - 'v*'  # Triggers on any tag starting with 'v' (e.g., v0.2.3, v1.0.0)
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # Required to create releases
+    
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-      - name: Build
-        run: ./gradlew --no-daemon clean build
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/libs/*.jar
-
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0     # Fetch all history for Axion Release
+        fetch-tags: true   # Explicitly fetch tags for better compatibility
+    
+    - name: Set up Java 21
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+        cache: 'gradle'
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Verify Git state (for debugging)
+      run: |
+        echo "Current tag: ${GITHUB_REF#refs/tags/}"
+        git describe --tags --always
+        git log -1 --oneline
+    
+    - name: Build with Gradle
+      run: ./gradlew build --no-daemon
+    
+    - name: Extract version from tag
+      id: version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: build/libs/*.jar
+        generate_release_notes: true  # Auto-generate changelog from commits
+        draft: false
+        prerelease: false
+        name: ${{ github.event.repository.name }} v${{ steps.version.outputs.version }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
