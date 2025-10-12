@@ -1,8 +1,8 @@
 # DuraPing
 
-[![CI](https://github.com/redkeysh/duraping/actions/workflows/ci.yml/badge.svg)](https://github.com/redkey-labs/duraping/actions/workflows/ci.yml)
-[![Release](https://github.com/redkeysh/duraping/actions/workflows/release.yml/badge.svg)](https://github.com/redkey-labs/duraping/actions/workflows/release.yml)
-[![License: GNU GPLv3](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&logo=github&style=for-the-badge&label=CI)](https://github.com/redlynxlabs/duraping/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?logo=github&style=for-the-badge&label=Release)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
+[![License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
 
 **Lightweight durability alerts for Minecraft 1.21.9 (Fabric)**
 
@@ -44,7 +44,7 @@ DuraPing is a client-side quality-of-life mod that helps you never break your fa
 ### Steps
 1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.21.9
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api)
-3. Download DuraPing from [Releases](https://github.com/redkey-labs/duraping/releases)
+3. Download DuraPing from [Releases](https://github.com/redlynxlabs/duraping/releases)
 4. Place all JARs in `.minecraft/mods/`
 5. Launch Minecraft with the Fabric profile
 
@@ -110,7 +110,7 @@ No server-side installation or permissions required.
 
 ### Building from Source
 ```bash
-git clone https://github.com/redkey-labs/duraping.git
+git clone https://github.com/redlynxlabs/duraping.git
 cd duraping
 ./gradlew build
 # Output: build/libs/DuraPing-<version>.jar
@@ -171,5 +171,6 @@ Contributions welcome! Please:
 
 ## Credits
 
+- **Organization**: [RedLynx Labs](https://redlynx.io) • [GitHub](https://github.com/redlynxlabs)
 - **Author**: [redkey](https://github.com/redkeysh)
 - Built with [Fabric](https://fabricmc.net/), [Cloth Config](https://github.com/shedaniel/cloth-config), and [Mod Menu](https://github.com/TerraformersMC/ModMenu)

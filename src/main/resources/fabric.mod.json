@@ -4,9 +4,10 @@
   "version": "${version}",
   "name": "${name}",
   "description": "Lightweight durability alerts with sound/chat/toast/flash. Client-only QoL.",
-  "authors": ["redkey"],
+  "authors": ["RedLynx Labs", "redkey"],
   "contact": {
-    "sources": "https://github.com/redkeysh/duraping"
+    "homepage": "https://redlynx.io",
+    "sources": "https://github.com/redlynxlabs/duraping"
   },
   "license": "GPL-3.0",
   "icon": "assets/duraping/icon.png",
