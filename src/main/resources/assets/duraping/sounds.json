@@ -1,5 +1,19 @@
 {
-  "warn":    { "sounds": [ { "name": "duraping:sounds/warn", "stream": false } ] },
-  "critical":{ "sounds": [ { "name": "duraping:sounds/critical", "stream": false } ] }
+  "warn": {
+    "sounds": [
+      {
+        "name": "duraping:warn",
+        "stream": false
+      }
+    ]
+  },
+  "critical": {
+    "sounds": [
+      {
+        "name": "duraping:critical",
+        "stream": false
+      }
+    ]
+  }
 }
 
