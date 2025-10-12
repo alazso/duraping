@@ -10,28 +10,66 @@ public class ModMenuIntegration implements ModMenuApi {
         return parent -> {
             var cfg = DuraPingConfig.get();
             var builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Text.literal("DuraPing Config"));
-            var cat = builder.getOrCreateCategory(Text.literal("General"));
             var entry = builder.entryBuilder();
 
-            cat.addEntry(entry.startBooleanToggle(Text.literal("Enabled"), cfg.enabled)
-                    .setSaveConsumer(v -> cfg.enabled = v)
-                    .build());
-            cat.addEntry(entry.startBooleanToggle(Text.literal("Chat Alerts"), cfg.chat)
+            // General Category
+            var general = builder.getOrCreateCategory(Text.literal("General"));
+            general.addEntry(entry.startBooleanToggle(Text.literal("Enabled"), cfg.enabled)
+                    .setTooltip(Text.literal("Master toggle for all durability alerts"))
+                    .setSaveConsumer(v -> cfg.enabled = v).build());
+            general.addEntry(entry.startBooleanToggle(Text.literal("Chat Alerts"), cfg.chat)
                     .setSaveConsumer(v -> cfg.chat = v).build());
-            cat.addEntry(entry.startBooleanToggle(Text.literal("Sound Alerts"), cfg.sound)
+            general.addEntry(entry.startBooleanToggle(Text.literal("Sound Alerts"), cfg.sound)
                     .setSaveConsumer(v -> cfg.sound = v).build());
-            cat.addEntry(entry.startBooleanToggle(Text.literal("Screen Flash"), cfg.flash)
+            general.addEntry(entry.startBooleanToggle(Text.literal("Screen Flash"), cfg.flash)
                     .setSaveConsumer(v -> cfg.flash = v).build());
-            cat.addEntry(entry.startBooleanToggle(Text.literal("Toast Alerts"), cfg.toast)
+            general.addEntry(entry.startBooleanToggle(Text.literal("Toast Alerts"), cfg.toast)
                     .setSaveConsumer(v -> cfg.toast = v).build());
-            cat.addEntry(entry.startIntField(Text.literal("Warn %"), cfg.warn)
+            general.addEntry(entry.startBooleanToggle(Text.literal("Elytra Flight Guard"), cfg.elytraGuard)
+                    .setTooltip(Text.literal("Extra warning when attempting to fly with critically low elytra"))
+                    .setSaveConsumer(v -> cfg.elytraGuard = v).build());
+
+            // Thresholds Category
+            var thresholds = builder.getOrCreateCategory(Text.literal("Thresholds"));
+            thresholds.addEntry(entry.startIntField(Text.literal("Warn %"), cfg.warn)
+                    .setTooltip(Text.literal("Percentage at which warn alerts trigger"))
                     .setMin(1).setMax(99).setSaveConsumer(v -> cfg.warn = v).build());
-            cat.addEntry(entry.startIntField(Text.literal("Danger %"), cfg.danger)
+            thresholds.addEntry(entry.startIntField(Text.literal("Danger %"), cfg.danger)
+                    .setTooltip(Text.literal("Percentage at which danger alerts trigger"))
                     .setMin(1).setMax(99).setSaveConsumer(v -> cfg.danger = v).build());
-            cat.addEntry(entry.startIntField(Text.literal("Critical %"), cfg.critical)
+            thresholds.addEntry(entry.startIntField(Text.literal("Critical %"), cfg.critical)
+                    .setTooltip(Text.literal("Percentage at which critical alerts trigger"))
                     .setMin(1).setMax(99).setSaveConsumer(v -> cfg.critical = v).build());
-            cat.addEntry(entry.startLongField(Text.literal("Cooldown (ms)"), cfg.cooldownMs)
-                    .setMin(0L).setSaveConsumer(v -> cfg.cooldownMs = v).build());
+            thresholds.addEntry(entry.startIntField(Text.literal("Hysteresis %"), cfg.hysteresisPct)
+                    .setTooltip(Text.literal("How far above threshold you must recover before alerts re-arm (prevents spam)"))
+                    .setMin(0).setMax(20).setSaveConsumer(v -> cfg.hysteresisPct = v).build());
+
+            // Cooldowns Category
+            var cooldowns = builder.getOrCreateCategory(Text.literal("Cooldowns"));
+            cooldowns.addEntry(entry.startLongField(Text.literal("Warn Cooldown (ms)"), cfg.warnCooldownMs)
+                    .setTooltip(Text.literal("Minimum time between warn alerts for the same item (30000 = 30s)"))
+                    .setMin(0L).setSaveConsumer(v -> cfg.warnCooldownMs = v).build());
+            cooldowns.addEntry(entry.startLongField(Text.literal("Danger Cooldown (ms)"), cfg.dangerCooldownMs)
+                    .setTooltip(Text.literal("Minimum time between danger alerts for the same item (45000 = 45s)"))
+                    .setMin(0L).setSaveConsumer(v -> cfg.dangerCooldownMs = v).build());
+            cooldowns.addEntry(entry.startLongField(Text.literal("Critical Cooldown (ms)"), cfg.criticalCooldownMs)
+                    .setTooltip(Text.literal("Minimum time between critical alerts for the same item (10000 = 10s)"))
+                    .setMin(0L).setSaveConsumer(v -> cfg.criticalCooldownMs = v).build());
+
+            // Activity-Aware Category
+            var activity = builder.getOrCreateCategory(Text.literal("Activity-Aware"));
+            activity.addEntry(entry.startBooleanToggle(Text.literal("Activity-Aware Mode"), cfg.activityAware)
+                    .setTooltip(Text.literal("Suppress alerts during continuous mining to reduce spam"))
+                    .setSaveConsumer(v -> cfg.activityAware = v).build());
+            activity.addEntry(entry.startIntField(Text.literal("Work Ticks Threshold"), cfg.workTicksThreshold)
+                    .setTooltip(Text.literal("How many ticks of continuous mining before suppression kicks in (20 = 1s)"))
+                    .setMin(1).setMax(100).setSaveConsumer(v -> cfg.workTicksThreshold = v).build());
+            activity.addEntry(entry.startLongField(Text.literal("Work Cooldown (ms)"), cfg.workCooldownMs)
+                    .setTooltip(Text.literal("Extended cooldown during mining (120000 = 2 minutes)"))
+                    .setMin(0L).setSaveConsumer(v -> cfg.workCooldownMs = v).build());
+            activity.addEntry(entry.startBooleanToggle(Text.literal("Quiet Below Warn"), cfg.quietBelowWarn)
+                    .setTooltip(Text.literal("In warn bucket, only show visual alerts after first crossing (no sound/chat)"))
+                    .setSaveConsumer(v -> cfg.quietBelowWarn = v).build());
 
             builder.setSavingRunnable(ConfigManager::save);
             return builder.build();
