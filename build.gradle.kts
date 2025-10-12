@@ -17,7 +17,7 @@ scmVersion {
 group = property("maven_group")!!
 version = scmVersion.version
 
-val minecraftVersion: String by project
+val minecraft_version: String by project
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(property("java_version").toString()))
@@ -36,7 +36,7 @@ dependencies {
     val loaderVersion = property("loader_version") as String
     val fabricApiVersion = property("fabric_api_version") as String
 
-    minecraft("com.mojang:minecraft:$minecraftVersion")
+    minecraft("com.mojang:minecraft:$minecraft_version")
     mappings("net.fabricmc:yarn:$yarnMappings:v2")
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
@@ -64,17 +64,17 @@ scmVersion {
 tasks.jar {
     from("LICENSE") { rename { "${it}_${project.property("mod_name")}" } }
     archiveBaseName.set("duraping")
-    archiveVersion.set("v${version}-${minecraftVersion}")
+    archiveVersion.set("v${version}-${minecraft_version}")
 }
 
 tasks.named<Jar>("remapJar") {
     archiveBaseName.set("duraping")
-    archiveVersion.set("v${version}-${minecraftVersion}")
+    archiveVersion.set("v${version}-${minecraft_version}")
 }
 
 tasks.named<Jar>("sourcesJar") {
     archiveBaseName.set("duraping")
-    archiveVersion.set("v${version}-${minecraftVersion}")
+    archiveVersion.set("v${version}-${minecraft_version}")
     archiveClassifier.set("sources")
 }
 
