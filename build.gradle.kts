@@ -4,6 +4,14 @@ plugins {
     java
 }
 
+scmVersion {
+    tag {
+        prefix.set("v")
+    }
+    // Axion only reads tags, doesn't create them
+    // Create tags manually: git tag -a v0.2.0 -m "Release 0.2.0"
+}
+
 group = property("maven_group")!!
 version = scmVersion.version
 

@@ -122,25 +122,30 @@ cd duraping
 - Open PRs from feature branches to `dev`
 - Merge `dev` → `main` for releases
 
-### Versioning (Axion Release)
-We use [Axion Release](https://github.com/allegro/axion-release-plugin) with semantic versioning and Conventional Commits.
+### Versioning & Releases
+We use [Axion Release](https://github.com/allegro/axion-release-plugin) to read version from Git tags and follow semantic versioning with Conventional Commits.
 
 **Creating a release:**
 ```bash
-# Bump minor version (0.1.0 → 0.2.0)
-./gradlew release
+# 1. Merge dev to main
+git checkout main
+git merge dev
+git push origin main
 
-# Bump patch (0.1.0 → 0.1.1)
-./gradlew release -Prelease.versionIncrementer=incrementPatch
+# 2. Create version tag (choose one)
+git tag -a v0.2.0 -m "Release 0.2.0"  # Minor version
+git tag -a v0.1.1 -m "Release 0.1.1"  # Patch version
+git tag -a v1.0.0 -m "Release 1.0.0"  # Major version
 
-# Bump major (0.1.0 → 1.0.0)
-./gradlew release -Prelease.versionIncrementer=incrementMajor
+# 3. Push the tag to trigger release workflow
+git push origin v0.2.0
 ```
 
-Axion will:
-1. Calculate next version from Git tags
-2. Create and push tag (e.g., `v0.2.0`)
-3. GitHub Actions `release.yml` builds and attaches JAR to GitHub Release
+GitHub Actions will:
+1. Detect the `v*.*.*` tag
+2. Build the mod JAR with versioned filename
+3. Create GitHub Release with changelog
+4. Attach JAR to the release
 
 ### Commit Convention
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
