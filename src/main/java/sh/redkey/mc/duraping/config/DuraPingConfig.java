@@ -23,7 +23,9 @@ public class DuraPingConfig {
 
     // How many percentage points above a threshold you must recover before re-arming alerts.
     // Example: warn at 25%, re-arm when back above 28% (25 + 3).
-    public int hysteresisPct = 3;
+    // Default 0: disabled (vanilla durability never recovers naturally).
+    // Set > 0 for: Mending with XP orbs, modded durability regen, or rapid item swapping.
+    public int hysteresisPct = 0;
 
     // Cooldowns per severity (milliseconds) for same item/slot while in the same bucket.
     public long warnCooldownMs = 30_000L;     // 30s

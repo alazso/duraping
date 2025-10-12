@@ -41,7 +41,7 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Text.literal("Percentage at which critical alerts trigger"))
                     .setMin(1).setMax(99).setSaveConsumer(v -> cfg.critical = v).build());
             thresholds.addEntry(entry.startIntField(Text.literal("Hysteresis %"), cfg.hysteresisPct)
-                    .setTooltip(Text.literal("How far above threshold you must recover before alerts re-arm (prevents spam)"))
+                    .setTooltip(Text.literal("Recovery margin before re-arming. 0=disabled (vanilla). Enable for Mending/modded regen."))
                     .setMin(0).setMax(20).setSaveConsumer(v -> cfg.hysteresisPct = v).build());
 
             // Cooldowns Category
