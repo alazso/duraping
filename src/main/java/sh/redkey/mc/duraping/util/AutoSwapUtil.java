@@ -24,6 +24,33 @@ public class AutoSwapUtil {
     private static final long SWAP_COOLDOWN_MS = 3000; // 3 second cooldown
     
     /**
+     * Check and auto-swap armor pieces if below threshold
+     * Called on tick (every 0.5 seconds) since armor doesn't trigger attack/use events
+     */
+    public static void checkAndSwapArmor(PlayerEntity player) {
+        if (player == null || player.isSpectator()) return;
+        
+        DuraPingConfig cfg = DuraPingConfig.get();
+        if (!cfg.autoSwapEnabled || !cfg.autoSwapArmor) return;
+        
+        // Check each armor slot
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            ItemStack currentArmor = player.getEquippedStack(slot);
+            if (currentArmor.isEmpty() || !currentArmor.isDamageable()) continue;
+            
+            int currentDurability = currentArmor.getMaxDamage() - currentArmor.getDamage();
+            int durabilityPercent = (int) Math.floor((currentDurability * 100.0) / currentArmor.getMaxDamage());
+            
+            // Check threshold
+            if (durabilityPercent <= cfg.autoSwapThreshold) {
+                System.out.println("[DuraPing] Armor " + slot.getName() + " below threshold: " + 
+                                  currentArmor.getName().getString() + " at " + durabilityPercent + "%");
+                attemptAutoSwap(player, slot);
+            }
+        }
+    }
+    
+    /**
      * Simple slot-based auto-swap (inspired by Low-Durability-Switcher)
      * Just changes the selected hotbar slot instead of complex inventory manipulation
      */

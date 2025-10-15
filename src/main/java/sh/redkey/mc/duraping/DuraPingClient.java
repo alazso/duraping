@@ -121,14 +121,20 @@ public class DuraPingClient implements ClientModInitializer {
             checkStack(ItemKey.of(client.player.getMainHandStack()), null);
             checkStack(ItemKey.of(client.player.getOffHandStack()), null);
 
-            // Armor
+            // Armor - check durability alerts
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR) continue;
                 ItemStack st = client.player.getEquippedStack(slot);
                 checkStack(ItemKey.of(st), slot);
             }
             
-            // Auto-swap is now handled by damage events, not tick checks
+            // Auto-swap armor on tick (armor doesn't trigger attack/use events like tools)
+            // Check every 10 ticks (~0.5 seconds) to reduce overhead
+            if (client.player.age % 10 == 0 && DuraPingConfig.get().autoSwapEnabled && DuraPingConfig.get().autoSwapArmor) {
+                AutoSwapUtil.checkAndSwapArmor(client.player);
+            }
+            
+            // Tool auto-swap is handled by attack/use events
         });
     }
 
