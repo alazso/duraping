@@ -74,13 +74,38 @@ public class ModMenuIntegration implements ModMenuApi {
                     .setTooltip(Text.literal("In warn bucket, only show visual alerts after first crossing (no sound/chat)"))
                     .setSaveConsumer(v -> cfg.quietBelowWarn = v).build());
 
+            // Auto-Swap Category
+            var autoSwap = builder.getOrCreateCategory(Text.literal("Auto-Swap"));
+            autoSwap.addEntry(entry.startBooleanToggle(Text.literal("Auto-Swap Enabled"), cfg.autoSwapEnabled)
+                    .setTooltip(Text.literal("Automatically swap to more durable items when current item falls below threshold"))
+                    .setSaveConsumer(v -> cfg.autoSwapEnabled = v).build());
+            autoSwap.addEntry(entry.startIntField(Text.literal("Auto-Swap Threshold (%)"), cfg.autoSwapThreshold)
+                    .setTooltip(Text.literal("Durability percentage at which auto-swap triggers"))
+                    .setMin(1).setMax(50).setSaveConsumer(v -> cfg.autoSwapThreshold = v).build());
+            autoSwap.addEntry(entry.startBooleanToggle(Text.literal("Auto-Swap Tools"), cfg.autoSwapTools)
+                    .setTooltip(Text.literal("Enable auto-swap for main hand tools"))
+                    .setSaveConsumer(v -> cfg.autoSwapTools = v).build());
+            autoSwap.addEntry(entry.startBooleanToggle(Text.literal("Auto-Swap Armor"), cfg.autoSwapArmor)
+                    .setTooltip(Text.literal("Enable auto-swap for armor pieces"))
+                    .setSaveConsumer(v -> cfg.autoSwapArmor = v).build());
+            autoSwap.addEntry(entry.startBooleanToggle(Text.literal("Auto-Swap Elytra"), cfg.autoSwapElytra)
+                    .setTooltip(Text.literal("Enable auto-swap for elytra"))
+                    .setSaveConsumer(v -> cfg.autoSwapElytra = v).build());
+            autoSwap.addEntry(entry.startBooleanToggle(Text.literal("Allow Lower Quality"), cfg.autoSwapAllowLowerQuality)
+                    .setTooltip(Text.literal("Allow swapping to lower quality items if they have more durability"))
+                    .setSaveConsumer(v -> cfg.autoSwapAllowLowerQuality = v).build());
+
             // Keybinds Info Category
             var keybinds = builder.getOrCreateCategory(Text.literal("Keybinds"));
             keybinds.addEntry(entry.startTextDescription(
-                    Text.literal("§6DuraPing Keybinds (defaults):§r\n\n" +
+                    Text.literal("§6DuraPing Keybinds:§r\n\n" +
                             "§e• Numpad 7§r - Toggle DuraPing on/off\n" +
                             "§e• Numpad 8§r - Snooze for 5 min / Cancel snooze\n" +
-                            "§e• Numpad 9§r - Show current hand durability\n\n" +
+                            "§e• Numpad 9§r - Show current hand durability\n" +
+                            "§e• Numpad 0§r - Manual auto-swap trigger\n\n" +
+                            "§7Optional keybinds (no defaults assigned):§r\n" +
+                            "§7• Auto-Swap Main Hand§r - Bind manually if desired\n" +
+                            "§7• Auto-Swap Armor§r - Bind manually if desired\n\n" +
                             "§7To rebind these keys, go to:\n" +
                             "Options → Controls → DuraPing§r")
             ).build());
