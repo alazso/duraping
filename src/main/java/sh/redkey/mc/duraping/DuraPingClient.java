@@ -6,11 +6,13 @@ import sh.redkey.mc.duraping.hud.HudFlashOverlay;
 import sh.redkey.mc.duraping.keybind.Keybinds;
 import sh.redkey.mc.duraping.sound.ModSounds;
 import sh.redkey.mc.duraping.util.AlertState;
-import sh.redkey.mc.duraping.util.DurabilityCalc;
+import sh.redkey.mc.duraping.util.AutoSwapUtil;
 import sh.redkey.mc.duraping.util.ItemKey;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -41,6 +43,16 @@ public class DuraPingClient implements ClientModInitializer {
         ModSounds.register();
         Keybinds.register();
         HudRenderCallback.EVENT.register(new HudFlashOverlay());
+        
+        // Register attack/use callbacks for auto-swap (simpler than tick-based tracking)
+        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            AutoSwapUtil.checkAndSwapTool(player);
+            return net.minecraft.util.ActionResult.PASS;
+        });
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            AutoSwapUtil.checkAndSwapTool(player);
+            return net.minecraft.util.ActionResult.PASS;
+        });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) return;
@@ -83,6 +95,15 @@ public class DuraPingClient implements ClientModInitializer {
                     int pct = (int)Math.floor(100.0 * left / h.getMaxDamage());
                     toast(h.getName().getString() + ": " + left + " (" + pct + "%)");
                 }
+            }, () -> {
+                // Manual auto-swap trigger
+                AutoSwapUtil.manualAutoSwap(client.player);
+            }, () -> {
+                // Manual main hand auto-swap trigger
+                AutoSwapUtil.manualAutoSwapMainHand(client.player);
+            }, () -> {
+                // Manual armor auto-swap trigger
+                AutoSwapUtil.manualAutoSwapArmor(client.player);
             });
 
             // Master toggle and snooze checks - return early if alerts disabled
@@ -106,6 +127,8 @@ public class DuraPingClient implements ClientModInitializer {
                 ItemStack st = client.player.getEquippedStack(slot);
                 checkStack(ItemKey.of(st), slot);
             }
+            
+            // Auto-swap is now handled by damage events, not tick checks
         });
     }
 
@@ -122,7 +145,6 @@ public class DuraPingClient implements ClientModInitializer {
         if (left == 2) {
             String k = keyFor(key, slot);
             var st = stateByKey.computeIfAbsent(k, _k -> new AlertState());
-            long now = System.currentTimeMillis();
             
             // Only fire once per item (when crossing into 2-durability, or if not yet tracked)
             // Check if we haven't alerted for 2-durability yet (lastPct will be different)
@@ -222,7 +244,6 @@ public class DuraPingClient implements ClientModInitializer {
         if (shouldAlert && (System.currentTimeMillis() >= snoozeUntil)) {
             // fire full alert
             boolean critical = (bucket == 3);
-            boolean danger = (bucket == 2);
             
             if (cfg.chat) {
                 var msg = switch (bucket) {
@@ -254,6 +275,7 @@ public class DuraPingClient implements ClientModInitializer {
         st.lastBucket = bucket;
         st.lastPct = pct;
     }
+    
 
     public static void toast(String msg) {
         if (MC == null || MC.getToastManager() == null) return;
