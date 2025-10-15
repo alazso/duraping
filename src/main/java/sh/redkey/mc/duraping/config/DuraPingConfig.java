@@ -42,6 +42,14 @@ public class DuraPingConfig {
     // Snooze duration in minutes
     public int snoozeDurationMinutes = 5;
 
+    // Auto-swap feature
+    public boolean autoSwapEnabled = false;
+    public int autoSwapThreshold = 15; // Percentage threshold to trigger auto-swap
+    public boolean autoSwapTools = true;
+    public boolean autoSwapArmor = true;
+    public boolean autoSwapElytra = true;
+    public boolean autoSwapAllowLowerQuality = true; // Allow swapping to lower quality items
+
     public Map<String, Thresholds> overrides = new HashMap<>();
 
     public Thresholds thresholdsFor(Identifier id) {
