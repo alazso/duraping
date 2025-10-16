@@ -1,7 +1,6 @@
 package sh.redkey.mc.duraping.sound;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.SoundManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;

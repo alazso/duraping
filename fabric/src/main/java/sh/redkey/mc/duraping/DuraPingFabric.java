@@ -2,6 +2,7 @@ package sh.redkey.mc.duraping;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import sh.redkey.mc.duraping.hud.HudFlashOverlay;
 import sh.redkey.mc.duraping.keybind.Keybinds;
 import sh.redkey.mc.duraping.sound.ModSounds;
@@ -19,6 +20,9 @@ public class DuraPingFabric implements ClientModInitializer {
         // Initialize the core with platform-specific implementations
         this.core = new DuraPingCore(keybinds, hudRenderer, soundManager);
         this.core.init();
+        
+        // Register HUD rendering callback
+        HudRenderCallback.EVENT.register(hudRenderer);
         
         // Register tick event
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
