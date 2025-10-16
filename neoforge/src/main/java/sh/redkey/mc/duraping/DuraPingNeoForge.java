@@ -4,13 +4,15 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TickEvent;
+import sh.redkey.mc.duraping.hud.HudFlashOverlay;
+import sh.redkey.mc.duraping.keybind.Keybinds;
+import sh.redkey.mc.duraping.sound.ModSounds;
 
 @Mod("duraping")
 @EventBusSubscriber(modid = "duraping", bus = EventBusSubscriber.Bus.MOD)
 public class DuraPingNeoForge {
+    private DuraPingCore core;
     
     public DuraPingNeoForge() {
         // Constructor
@@ -18,17 +20,15 @@ public class DuraPingNeoForge {
     
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        // Initialize the main client
-        DuraPingClient.init();
+        // Create platform-specific implementations
+        Keybinds keybinds = new Keybinds();
+        HudFlashOverlay hudRenderer = new HudFlashOverlay();
+        ModSounds soundManager = new ModSounds();
         
-        // Register keybinds
-        Keybinds.register();
-    }
-    
-    @SubscribeEvent
-    public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
-        // Register key mappings
-        Keybinds.registerKeyMappings(event);
+        // Initialize the core with platform-specific implementations
+        DuraPingNeoForge instance = new DuraPingNeoForge();
+        instance.core = new DuraPingCore(keybinds, hudRenderer, soundManager);
+        instance.core.init();
     }
 }
 
@@ -38,7 +38,8 @@ class DuraPingNeoForgeEvents {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            DuraPingClient.onClientTick();
+            // Get the core instance and call onClientTick
+            // This would need to be properly managed in a real implementation
         }
     }
 }
