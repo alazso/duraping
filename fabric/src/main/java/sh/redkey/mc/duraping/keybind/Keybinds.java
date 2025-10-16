@@ -6,17 +6,18 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
-public class Keybinds {
+public class Keybinds implements KeybindManager {
     private static final KeyBinding.Category CATEGORY = new KeyBinding.Category(Identifier.of("duraping", "keybinds"));
     
-    private static KeyBinding toggle;
-    private static KeyBinding snooze;
-    private static KeyBinding show;
-    private static KeyBinding autoSwap;
-    private static KeyBinding autoSwapMainHand;
-    private static KeyBinding autoSwapArmor;
+    private KeyBinding toggle;
+    private KeyBinding snooze;
+    private KeyBinding show;
+    private KeyBinding autoSwap;
+    private KeyBinding autoSwapMainHand;
+    private KeyBinding autoSwapArmor;
 
-    public static void register() {
+    @Override
+    public void register() {
         toggle = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.duraping.toggle",
             InputUtil.Type.KEYSYM,
@@ -54,13 +55,17 @@ public class Keybinds {
             CATEGORY
         ));
     }
-    public static void tick(Runnable onToggle, Runnable onSnooze, Runnable onShow, Runnable onAutoSwap, Runnable onAutoSwapMainHand, Runnable onAutoSwapArmor) {
-        while (toggle.wasPressed()) onToggle.run();
-        while (snooze.wasPressed()) onSnooze.run();
-        while (show.wasPressed())   onShow.run();
-        while (autoSwap.wasPressed()) onAutoSwap.run();
-        while (autoSwapMainHand.wasPressed()) onAutoSwapMainHand.run();
-        while (autoSwapArmor.wasPressed()) onAutoSwapArmor.run();
+    
+    @Override
+    public boolean wasPressed(KeybindType keybind) {
+        return switch (keybind) {
+            case TOGGLE -> toggle.wasPressed();
+            case SNOOZE -> snooze.wasPressed();
+            case SHOW -> show.wasPressed();
+            case AUTO_SWAP -> autoSwap.wasPressed();
+            case AUTO_SWAP_MAIN_HAND -> autoSwapMainHand.wasPressed();
+            case AUTO_SWAP_ARMOR -> autoSwapArmor.wasPressed();
+        };
     }
 }
 

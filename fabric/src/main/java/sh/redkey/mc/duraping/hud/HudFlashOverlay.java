@@ -5,7 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 
-public class HudFlashOverlay implements HudRenderCallback {
+public class HudFlashOverlay implements HudRenderer, HudRenderCallback {
     private static float alpha = 0f;
     private static long until = 0;
 
@@ -15,8 +15,19 @@ public class HudFlashOverlay implements HudRenderCallback {
     }
 
     @Override
+    public void render(float partialTicks) {
+        // This method is called by the common interface
+        // The actual rendering is handled by the Fabric callback
+    }
+
+    @Override
+    public boolean shouldRender() {
+        return System.currentTimeMillis() <= until;
+    }
+
+    @Override
     public void onHudRender(DrawContext ctx, RenderTickCounter tickCounter) {
-        if (System.currentTimeMillis() > until) return;
+        if (!shouldRender()) return;
         var mc = MinecraftClient.getInstance();
         if (mc == null || mc.getWindow() == null) return;
         int w = mc.getWindow().getScaledWidth();
