@@ -1,38 +1,35 @@
 {
-  "schemaVersion": 1,
-  "id": "duraping",
-  "version": "${version}",
-  "name": "DuraPing",
-  "description": "A client-side mod for durability alerts and auto-swapping",
-  "authors": [
-    "RedKey"
-  ],
-  "contact": {
-    "homepage": "https://github.com/redlynxlabs/duraping",
-    "issues": "https://github.com/redlynxlabs/duraping/issues",
-    "sources": "https://github.com/redlynxlabs/duraping"
-  },
-  "license": "MIT",
-  "icon": "assets/duraping/icon.png",
-  "environment": "client",
-  "entrypoints": {
-    "client": [
-      "sh.redkey.mc.duraping.DuraPingFabric"
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
     ],
-    "modmenu": [
-      "sh.redkey.mc.duraping.config.ModMenuIntegration"
-    ]
-  },
-  "mixins": [
-    "duraping.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.17.3",
-    "fabric-api": "*",
-    "minecraft": ">=1.21.9",
-    "java": ">=21"
-  },
-  "suggests": {
-    "modmenu": "*"
-  }
+    "contact": {
+        "homepage": "https://github.com/redlynxlabs/duraping",
+        "sources": "https://github.com/redlynxlabs/duraping"
+    },
+    "license": "${license}",
+    "icon": "${mod_id}.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "sh.redkey.mc.duraping.DuraPingFabric"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "~${minecraft_version}",
+        "java": ">=${java_version}"
+    },
+    "suggests": {
+        "modmenu": "*",
+        "cloth-config": "*"
+    }
 }

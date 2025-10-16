@@ -1,23 +1,21 @@
 package sh.redkey.mc.duraping;
 
-import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 
-public class DuraPingFabric implements ClientModInitializer {
+public class DuraPingFabric implements ModInitializer {
     @Override
-    public void onInitializeClient() {
+    public void onInitialize() {
         System.out.println("[DuraPing] Fabric mod initialized!");
         
         // Register HUD rendering callback
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
             // Simple HUD rendering for now
             if (System.currentTimeMillis() % 2000 < 100) { // Flash every 2 seconds
-                var mc = net.minecraft.client.MinecraftClient.getInstance();
-                if (mc != null && mc.getWindow() != null) {
-                    int w = mc.getWindow().getScaledWidth();
-                    int h = mc.getWindow().getScaledHeight();
-                    drawContext.fill(0, 0, w, h, 0x20FF0000); // Red tint
+                var mc = net.minecraft.client.Minecraft.getInstance();
+                if (mc != null) {
+                    System.out.println("[DuraPing] HUD render - Minecraft instance: " + mc);
                 }
             }
         });
