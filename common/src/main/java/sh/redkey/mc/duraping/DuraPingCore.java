@@ -61,15 +61,18 @@ public class DuraPingCore {
         }
         
         if (keybindManager.wasPressed(KeybindManager.KeybindType.AUTO_SWAP)) {
-            AutoSwapUtil.manualAutoSwap(null); // Platform-specific player will be passed
+            // Platform-specific player will be passed by the platform implementation
+            // AutoSwapUtil.manualAutoSwap(player);
         }
         
         if (keybindManager.wasPressed(KeybindManager.KeybindType.AUTO_SWAP_MAIN_HAND)) {
-            AutoSwapUtil.manualAutoSwapMainHand(null); // Platform-specific player will be passed
+            // Platform-specific player will be passed by the platform implementation
+            // AutoSwapUtil.manualAutoSwapMainHand(player);
         }
         
         if (keybindManager.wasPressed(KeybindManager.KeybindType.AUTO_SWAP_ARMOR)) {
-            AutoSwapUtil.manualAutoSwapArmor(null); // Platform-specific player will be passed
+            // Platform-specific player will be passed by the platform implementation
+            // AutoSwapUtil.manualAutoSwapArmor(player);
         }
         
         // Update HUD rendering

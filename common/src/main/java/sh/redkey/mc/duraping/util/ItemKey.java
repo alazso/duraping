@@ -1,16 +1,23 @@
 package sh.redkey.mc.duraping.util;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-
+/**
+ * Platform-agnostic representation of an item key.
+ * Used for identifying and comparing items across platforms.
+ */
 public record ItemKey(ItemStack stack, Identifier id) {
     public static ItemKey of(ItemStack s) {
-        if (s == null || s.isEmpty()) return new ItemKey(ItemStack.EMPTY, Identifier.of("minecraft","air"));
-        return new ItemKey(s, Registries.ITEM.getId(s.getItem()));
+        if (s == null || s.isEmpty()) {
+            return new ItemKey(null, Identifier.of("minecraft", "air"));
+        }
+        return new ItemKey(s, Identifier.of(s.getItemId()));
     }
-    public boolean isEmpty() { return stack == null || stack.isEmpty(); }
-    public String displayName() { return stack.getName().getString(); }
+    
+    public boolean isEmpty() { 
+        return stack == null || stack.isEmpty(); 
+    }
+    
+    public String displayName() { 
+        return stack != null ? stack.getDisplayName() : "Air"; 
+    }
 }
 

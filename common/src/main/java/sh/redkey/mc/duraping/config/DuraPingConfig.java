@@ -1,6 +1,6 @@
 package sh.redkey.mc.duraping.config;
 
-import net.minecraft.util.Identifier;
+import sh.redkey.mc.duraping.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +69,40 @@ public class DuraPingConfig {
 
     private static DuraPingConfig INSTANCE = new DuraPingConfig();
     public static DuraPingConfig get() { return INSTANCE; }
+    public static DuraPingConfig getInstance() { return INSTANCE; }
     public static void set(DuraPingConfig v) { INSTANCE = v; }
+    
+    /**
+     * Load configuration from file.
+     */
+    public void load() {
+        // Platform-specific implementations should override this method
+        // For now, just use default values
+    }
+    
+    /**
+     * Toggle the enabled state.
+     */
+    public void toggleEnabled() {
+        enabled = !enabled;
+    }
+    
+    /**
+     * Snooze alerts for the configured duration.
+     */
+    public void snooze() {
+        // Platform-specific implementations should override this method
+        // For now, just log the action
+        System.out.println("[DuraPing] Snoozing alerts for " + snoozeDurationMinutes + " minutes");
+    }
+    
+    /**
+     * Show the configuration screen.
+     */
+    public void showConfig() {
+        // Platform-specific implementations should override this method
+        // For now, just log the action
+        System.out.println("[DuraPing] Opening configuration screen");
+    }
 }
 
