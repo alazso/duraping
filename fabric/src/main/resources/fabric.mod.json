@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "duraping",
+  "version": "${version}",
+  "name": "DuraPing",
+  "description": "A client-side mod for durability alerts and auto-swapping",
+  "authors": [
+    "RedKey"
+  ],
+  "contact": {
+    "homepage": "https://github.com/redlynxlabs/duraping",
+    "issues": "https://github.com/redlynxlabs/duraping/issues",
+    "sources": "https://github.com/redlynxlabs/duraping"
+  },
+  "license": "MIT",
+  "icon": "assets/duraping/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "sh.redkey.mc.duraping.DuraPingFabric"
+    ],
+    "modmenu": [
+      "sh.redkey.mc.duraping.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "duraping.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17.3",
+    "fabric-api": "*",
+    "minecraft": ">=1.21.9",
+    "java": ">=21"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

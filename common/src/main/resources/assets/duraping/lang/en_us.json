@@ -1,0 +1,14 @@
+{
+  "text.duraping.warn": "%s is getting low (%s uses left)",
+  "text.duraping.danger": "%s is in DANGER (%s uses left)",
+  "text.duraping.critical": "%s is CRITICAL (%s uses left)",
+  "key.duraping.toggle": "Toggle DuraPing",
+  "key.duraping.snooze": "Snooze/Cancel Alerts",
+  "key.duraping.show": "Show Hand Durability",
+  "key.duraping.autoswap": "Manual Auto-Swap",
+  "key.duraping.autoswap_mainhand": "Auto-Swap Main Hand",
+  "key.duraping.autoswap_armor": "Auto-Swap Armor",
+  "key.category.duraping.keybinds": "DuraPing",
+  "category.duraping": "DuraPing"
+}
+
