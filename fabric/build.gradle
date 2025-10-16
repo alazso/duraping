@@ -1,24 +1,7 @@
 plugins {
-    // id 'multiloader-loader'  // Temporarily disabled to fix compilation
+    id 'multiloader-loader'
     id 'fabric-loom'
 }
-
-repositories {
-    mavenCentral()
-    maven {
-        name = 'Fabric'
-        url = 'https://maven.fabricmc.net/'
-    }
-    maven {
-        name = 'Shedaniel'
-        url = 'https://maven.shedaniel.me/'
-    }
-    maven {
-        name = 'TerraformersMC'
-        url = 'https://maven.terraformersmc.com/releases/'
-    }
-}
-
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
@@ -27,13 +10,6 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    
-    // Common module dependency
-    implementation project(':common')
-    
-    // Config UI
-    modImplementation "me.shedaniel.cloth:cloth-config-fabric:15.0.130"
-    modImplementation "com.terraformersmc:modmenu:11.0.0"
 }
 
 loom {

@@ -3,36 +3,31 @@ package sh.redkey.mc.duraping;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import sh.redkey.mc.duraping.hud.HudFlashOverlay;
-import sh.redkey.mc.duraping.keybind.Keybinds;
-import sh.redkey.mc.duraping.sound.ModSounds;
 
 public class DuraPingFabric implements ClientModInitializer {
-    private DuraPingCore core;
-    
     @Override
     public void onInitializeClient() {
-        // Create platform-specific implementations
-        Keybinds keybinds = new Keybinds();
-        HudFlashOverlay hudRenderer = new HudFlashOverlay();
-        ModSounds soundManager = new ModSounds();
-        
-        // Initialize the core with platform-specific implementations
-        this.core = new DuraPingCore(keybinds, hudRenderer, soundManager);
-        this.core.init();
+        System.out.println("[DuraPing] Fabric mod initialized!");
         
         // Register HUD rendering callback
-        HudRenderCallback.EVENT.register(hudRenderer);
-        
-        // Register tick event
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.player != null) {
-                this.core.onClientTick();
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+            // Simple HUD rendering for now
+            if (System.currentTimeMillis() % 2000 < 100) { // Flash every 2 seconds
+                var mc = net.minecraft.client.MinecraftClient.getInstance();
+                if (mc != null && mc.getWindow() != null) {
+                    int w = mc.getWindow().getScaledWidth();
+                    int h = mc.getWindow().getScaledHeight();
+                    drawContext.fill(0, 0, w, h, 0x20FF0000); // Red tint
+                }
             }
         });
-    }
-    
-    public DuraPingCore getCore() {
-        return core;
+
+        // Register tick event
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            // Simple tick handling for now
+            if (client.player != null && System.currentTimeMillis() % 5000 < 50) {
+                System.out.println("[DuraPing] Player tick: " + client.player.getName().getString());
+            }
+        });
     }
 }
