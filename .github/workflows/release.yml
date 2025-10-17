@@ -163,10 +163,13 @@ jobs:
           # Copy JAR files
           cp ${{ matrix.platform }}/build/libs/*.jar artifacts/
           
-          # Create platform-specific artifact names
+          # Create platform-specific artifact names (only if needed)
           for jar in artifacts/*.jar; do
             if [[ "$jar" =~ duraping-${{ matrix.platform }}-.*\.jar$ ]]; then
-              mv "$jar" "artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
+              new_name="artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
+              if [[ "$jar" != "$new_name" ]]; then
+                mv "$jar" "$new_name"
+              fi
             fi
           done
           
