@@ -26,9 +26,8 @@ scmVersion {
     ignoreUncommittedChanges = true
 }
 
-// Set version from environment or fallback to development version
-// GitHub Actions will override this during releases
-version = System.getenv('RELEASE_VERSION') ?: "0.5.0-dev-SNAPSHOT"
+// Set version manually for parallel release tracks
+version = "0.5.0-dev-SNAPSHOT"
 
 allprojects {
     repositories {
