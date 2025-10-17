@@ -1,6 +1,6 @@
 package sh.redkey.mc.duraping.config;
 
-import sh.redkey.mc.duraping.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +52,7 @@ public class DuraPingConfig {
 
     public Map<String, Thresholds> overrides = new HashMap<>();
 
-    public Thresholds thresholdsFor(Identifier id) {
+    public Thresholds thresholdsFor(ResourceLocation id) {
         Thresholds ov = overrides.get(id.toString());
         if (ov != null) return ov.normalize();
         return new Thresholds(warn, danger, critical).normalize();
@@ -69,40 +69,6 @@ public class DuraPingConfig {
 
     private static DuraPingConfig INSTANCE = new DuraPingConfig();
     public static DuraPingConfig get() { return INSTANCE; }
-    public static DuraPingConfig getInstance() { return INSTANCE; }
     public static void set(DuraPingConfig v) { INSTANCE = v; }
-    
-    /**
-     * Load configuration from file.
-     */
-    public void load() {
-        // Platform-specific implementations should override this method
-        // For now, just use default values
-    }
-    
-    /**
-     * Toggle the enabled state.
-     */
-    public void toggleEnabled() {
-        enabled = !enabled;
-    }
-    
-    /**
-     * Snooze alerts for the configured duration.
-     */
-    public void snooze() {
-        // Platform-specific implementations should override this method
-        // For now, just log the action
-        System.out.println("[DuraPing] Snoozing alerts for " + snoozeDurationMinutes + " minutes");
-    }
-    
-    /**
-     * Show the configuration screen.
-     */
-    public void showConfig() {
-        // Platform-specific implementations should override this method
-        // For now, just log the action
-        System.out.println("[DuraPing] Opening configuration screen");
-    }
 }
 

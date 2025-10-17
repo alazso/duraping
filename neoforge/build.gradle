@@ -1,5 +1,7 @@
 plugins {
+    id 'multiloader-loader'
     id 'net.neoforged.moddev'
+    id 'me.modmuss50.mod-publish-plugin'
 }
 
 neoForge {
@@ -16,7 +18,7 @@ neoForge {
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
-            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})"
         }
         client {
             client()
@@ -25,7 +27,6 @@ neoForge {
             clientData()
 
             // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
         server {
@@ -41,25 +42,52 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-repositories {
-    mavenCentral()
-    maven {
-        name = 'NeoForge'
-        url = 'https://maven.neoforged.net/releases'
-    }
-    maven {
-        name = 'Shedaniel'
-        url = 'https://maven.shedaniel.me/'
-    }
-    maven {
-        name = 'TerraformersMC'
-        url = 'https://maven.terraformersmc.com/releases/'
+tasks.jar.doFirst {
+    def modsTomlFile = file("$buildDir/resources/main/META-INF/neoforge.mods.toml")
+    if (modsTomlFile.exists()) {
+        def content = modsTomlFile.text
+        content = content.replace('version = "unspecified"', "version = \"${rootProject.version}\"")
+        modsTomlFile.text = content
     }
 }
 
-dependencies {
+publishMods {
+    file = tasks.jar.archiveFile
+    changelog = providers.fileContents(layout.projectDirectory.file("../../CHANGELOG.md")).asText
+    type = STABLE
+    modLoaders.add("neoforge")
+    displayName = "DuraPing v${version}"
     
-    // Config UI - NeoForge uses regular implementation
-    implementation "me.shedaniel.cloth:cloth-config-neoforge:15.0.130"
-    implementation "com.terraformersmc:modmenu:11.0.0"
+    // Enable dry run if API keys are missing (for local testing)
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+    
+    // CurseForge Publishing
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = property("curseforge_id").toString()
+        minecraftVersions.add(minecraft_version)
+        
+        // Dependencies
+        requires {
+            slug = "neoforge"
+        }
+        requires {
+            slug = "cloth-config"
+        }
+        optional {
+            slug = "modmenu"
+        }
+    }
+    
+    // Modrinth Publishing
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = property("modrinth_id").toString()
+        minecraftVersions.add(minecraft_version)
+        
+        // Dependencies
+        requires("neoforge")
+        requires("cloth-config")
+        optional("modmenu")
+    }
 }

@@ -3,4 +3,32 @@ plugins {
     id 'fabric-loom' version '1.11-SNAPSHOT' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.115' apply false
+    // Axion release for version management
+    id 'pl.allegro.tech.build.axion-release' version '1.18.15'
+    // Mod publishing plugin
+    id 'me.modmuss50.mod-publish-plugin' version '0.7.4' apply false
+}
+
+// Configure Axion Release
+scmVersion {
+    tag {
+        prefix = "v"
+    }
+    // Support for beta tags: v0.5.0-beta, v0.5.1-beta, etc.
+    // Stable tags: v0.5.0, v0.5.1, etc.
+    // Create tags manually: git tag -a v0.5.0-beta -m "Release 0.5.0-beta"
+    versionIncrementer 'incrementMinor'
+    branchVersionIncrementer = [".*": "incrementMinor"]
+}
+
+// Set version from Axion
+version = scmVersion.version
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.shedaniel.me/' } // Cloth Config + Mod Menu
+        maven { url = 'https://maven.terraformersmc.com/releases/' } // Mod Menu
+    }
 }

@@ -1,16 +1,24 @@
-# Gradle
-.gradle/
-build/
-out/
-bin/
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
 
-# IDE
-.idea/
+# idea
+out
+*.ipr
+*.iws
 *.iml
-.vscode/
+.idea/*
+!.idea/scopes
 
-# OS
-.DS_Store
+# gradle
+build
+.gradle
 
-# Loom cache
-run/
+# other
+eclipse
+run
+runs

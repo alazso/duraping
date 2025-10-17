@@ -2,6 +2,7 @@ package sh.redkey.mc.duraping.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import sh.redkey.mc.duraping.platform.Services;
 
 import java.io.File;
 import java.io.FileReader;
@@ -9,8 +10,9 @@ import java.io.FileWriter;
 
 public class ConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    
     private static File file() {
-        return new File("./config/duraping.json");
+        return new File(Services.PLATFORM.getConfigDir().toFile(), "duraping.json");
     }
 
     public static void load() {

@@ -1,35 +1,30 @@
 {
-    "schemaVersion": 1,
-    "id": "${mod_id}",
-    "version": "${version}",
-    "name": "${mod_name}",
-    "description": "${description}",
-    "authors": [
-        "${mod_author}"
+  "schemaVersion": 1,
+  "id": "duraping",
+  "version": "${version}",
+  "name": "DuraPing",
+  "description": "Lightweight durability alerts with sound/chat/toast/flash. Client-only QoL.",
+  "authors": ["RedLynx Labs", "redkey"],
+  "contact": {
+    "homepage": "https://redlynx.io",
+    "sources": "https://github.com/redlynxlabs/duraping"
+  },
+  "license": "GPL-3.0",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "sh.redkey.mc.duraping.DuraPingFabric"
     ],
-    "contact": {
-        "homepage": "https://github.com/redlynxlabs/duraping",
-        "sources": "https://github.com/redlynxlabs/duraping"
-    },
-    "license": "${license}",
-    "icon": "${mod_id}.png",
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "sh.redkey.mc.duraping.DuraPingFabric"
-        ]
-    },
-    "mixins": [
-        "${mod_id}.mixins.json"
-    ],
-    "depends": {
-        "fabricloader": ">=${fabric_loader_version}",
-        "fabric-api": "*",
-        "minecraft": "~${minecraft_version}",
-        "java": ">=${java_version}"
-    },
-    "suggests": {
-        "modmenu": "*",
-        "cloth-config": "*"
-    }
+    "modmenu": [
+      "sh.redkey.mc.duraping.config.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.17.3",
+    "fabric-api": "*",
+    "minecraft": "~1.21.9"
+  },
+  "mixins": [
+    "duraping.fabric.mixins.json"
+  ]
 }

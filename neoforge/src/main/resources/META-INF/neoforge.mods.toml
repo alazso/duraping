@@ -1,40 +1,28 @@
-modLoader="neoforge"
-loaderVersion="[4,)"
+modLoader = "javafml"
+loaderVersion = "${neoforge_loader_version_range}"
+license = "GPL-3.0"
 
 [[mods]]
-modId="duraping"
-version="${version}"
-displayName="${mod_name}"
-description="${description}"
-authors="${mod_author}"
-credits="${credits}"
-logoFile="assets/duraping/icon.png"
-updateJSONURL="https://github.com/${github_repo}/releases/latest/download/update.json"
+modId = "duraping"
+version = "${version}"
+displayName = "DuraPing"
+description = '''
+Lightweight durability alerts with sound/chat/toast/flash. Client-only QoL.
+'''
+authors = "RedLynx Labs, redkey"
+displayURL = "https://redlynx.io"
+logoFile = "logo.png"
 
 [[dependencies.duraping]]
-modId="neoforge"
-mandatory=true
-versionRange="[${neoforge_version},)"
-ordering="NONE"
-side="BOTH"
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_loader_version_range}"
+ordering = "NONE"
+side = "CLIENT"
 
 [[dependencies.duraping]]
-modId="minecraft"
-mandatory=true
-versionRange="[${minecraft_version_range})"
-ordering="NONE"
-side="BOTH"
-
-[[dependencies.duraping]]
-modId="cloth-config"
-mandatory=true
-versionRange="[15.0.0,)"
-ordering="NONE"
-side="BOTH"
-
-[[dependencies.duraping]]
-modId="modmenu"
-mandatory=false
-versionRange="[11.0.0,)"
-ordering="NONE"
-side="CLIENT"
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "CLIENT"
