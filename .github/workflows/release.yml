@@ -142,9 +142,6 @@ jobs:
 
       - name: 🔧 Configure Build
         run: |
-          # Update version in build.gradle
-          sed -i "s/version = \".*\"/version = \"${{ needs.detect-release-info.outputs.version }}\"/" build.gradle
-          
           # Update Minecraft version in gradle.properties
           sed -i "s/minecraft_version=.*/minecraft_version=${{ needs.detect-release-info.outputs.minecraft_version }}/" gradle.properties
           
@@ -154,6 +151,8 @@ jobs:
           echo "  Platform: ${{ matrix.platform }}"
 
       - name: Build Project
+        env:
+          RELEASE_VERSION: ${{ needs.detect-release-info.outputs.version }}
         run: ./gradlew :${{ matrix.platform }}:build --no-daemon --parallel --build-cache
 
       - name: Prepare Artifacts

@@ -50,9 +50,9 @@ if ! git diff-index --quiet HEAD --; then
     exit 1
 fi
 
-# Update version in build.gradle
-echo -e "${BLUE}📝 Updating version in build.gradle...${NC}"
-sed -i "s/version = \".*\"/version = \"${FULL_VERSION}\"/" build.gradle
+# Set environment variable for version
+echo -e "${BLUE}📝 Setting release version...${NC}"
+export RELEASE_VERSION="${FULL_VERSION}"
 
 # Update Minecraft version in gradle.properties
 echo -e "${BLUE}📝 Updating Minecraft version in gradle.properties...${NC}"
@@ -60,10 +60,9 @@ sed -i "s/minecraft_version=.*/minecraft_version=${MC_VERSION}/" gradle.properti
 
 # Commit version changes
 echo -e "${BLUE}💾 Committing version changes...${NC}"
-git add build.gradle gradle.properties
-git commit -m "chore: bump version to ${FULL_VERSION}
+git add gradle.properties
+git commit -m "chore: prepare for ${FULL_VERSION} release
 
-- Update version to ${FULL_VERSION}
 - Update Minecraft version to ${MC_VERSION}
 - Prepare for ${TYPE} release"
 
