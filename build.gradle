@@ -26,8 +26,14 @@ scmVersion {
     ignoreUncommittedChanges = true
 }
 
-// Set version manually for parallel release tracks
-version = "0.5.0-stable-1.21.10"
+// Set version from Axion (overridden by GitHub Actions during releases)
+// Fallback to development version if Axion fails
+try {
+    version = scmVersion.version
+} catch (Exception e) {
+    version = "0.5.0-dev-SNAPSHOT"
+    println "⚠️  Axion version failed, using fallback: ${version}"
+}
 
 allprojects {
     repositories {
