@@ -63,7 +63,7 @@ public class DuraPingFabric implements ClientModInitializer {
     }
 
     private void registerKeybinds() {
-        // Use the MISC category for now - we can't easily create custom categories in 1.21.10
+        // Use the MISC category for now - we can't easily create custom categories in 1.21.9
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.duraping.toggle",
             InputConstants.Type.KEYSYM,
