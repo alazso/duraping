@@ -33,6 +33,10 @@ on:
 env:
   GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+UseCompressedOops"
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   detect-release-info:
     runs-on: ubuntu-latest
