@@ -134,7 +134,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: 🏗️ Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
           cache-read-only: false
