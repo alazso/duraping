@@ -1,7 +1,8 @@
 # DuraPing
 
-[![Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/build.yml?branch=main&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/build.yml)
+[![Latest Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?branch=main&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
 [![Latest Release](https://img.shields.io/github/v/release/redlynxlabs/duraping?logo=github&style=for-the-badge&label=Latest)](https://github.com/redlynxlabs/duraping/releases/latest)
+[![Previous Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?branch=stable/1.21.9&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
 [![License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
 [![Discord](https://img.shields.io/discord/1402745018682179624?label=discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/hologram)
 
