@@ -26,14 +26,9 @@ scmVersion {
     ignoreUncommittedChanges = true
 }
 
-// Set version from Axion (overridden by GitHub Actions during releases)
-// Fallback to development version if Axion fails
-try {
-    version = scmVersion.version
-} catch (Exception e) {
-    version = "0.5.0-dev-SNAPSHOT"
-    println "⚠️  Axion version failed, using fallback: ${version}"
-}
+// Set version from environment or fallback to development version
+// GitHub Actions will override this during releases
+version = System.getenv('RELEASE_VERSION') ?: "0.5.0-dev-SNAPSHOT"
 
 allprojects {
     repositories {
