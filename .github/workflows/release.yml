@@ -1,0 +1,217 @@
+name: 🚀 Multi-Branch Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*-stable-*'
+      - 'v*-beta-*'
+      - 'v*-rc-*'
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Release type'
+        required: true
+        default: 'stable'
+        type: choice
+        options:
+          - stable
+          - beta
+          - rc
+      minecraft_version:
+        description: 'Minecraft version'
+        required: true
+        default: '1.21.10'
+        type: choice
+        options:
+          - '1.21.9'
+          - '1.21.10'
+      custom_version:
+        description: 'Custom version (optional)'
+        required: false
+        type: string
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2G -XX:+UseG1GC"
+
+jobs:
+  detect-release-info:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.detect.outputs.version }}
+      minecraft_version: ${{ steps.detect.outputs.minecraft_version }}
+      release_type: ${{ steps.detect.outputs.release_type }}
+      is_prerelease: ${{ steps.detect.outputs.is_prerelease }}
+      branch: ${{ steps.detect.outputs.branch }}
+    steps:
+      - name: 🔍 Detect Release Information
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual dispatch
+            VERSION="${{ inputs.custom_version }}"
+            if [ -z "$VERSION" ]; then
+              VERSION="0.5.0-${{ inputs.version_type }}-${{ inputs.minecraft_version }}"
+            fi
+            MC_VERSION="${{ inputs.minecraft_version }}"
+            RELEASE_TYPE="${{ inputs.version_type }}"
+            BRANCH="main"
+            if [ "$MC_VERSION" = "1.21.9" ]; then
+              BRANCH="stable/1.21.9"
+            fi
+          else
+            # Tag push
+            TAG_NAME="${{ github.ref_name }}"
+            VERSION="${TAG_NAME#v}"
+            
+            # Extract Minecraft version from tag
+            if [[ "$TAG_NAME" =~ -1\.21\.9$ ]]; then
+              MC_VERSION="1.21.9"
+              BRANCH="stable/1.21.9"
+            else
+              MC_VERSION="1.21.10"
+              BRANCH="main"
+            fi
+            
+            # Extract release type
+            if [[ "$TAG_NAME" =~ -stable- ]]; then
+              RELEASE_TYPE="stable"
+            elif [[ "$TAG_NAME" =~ -beta- ]]; then
+              RELEASE_TYPE="beta"
+            elif [[ "$TAG_NAME" =~ -rc- ]]; then
+              RELEASE_TYPE="rc"
+            else
+              RELEASE_TYPE="stable"
+            fi
+          fi
+          
+          # Determine if prerelease
+          if [ "$RELEASE_TYPE" = "beta" ] || [ "$RELEASE_TYPE" = "rc" ]; then
+            IS_PRERELEASE="true"
+          else
+            IS_PRERELEASE="false"
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "minecraft_version=$MC_VERSION" >> $GITHUB_OUTPUT
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          
+          echo "🎯 Release Info:"
+          echo "  Version: $VERSION"
+          echo "  Minecraft: $MC_VERSION"
+          echo "  Type: $RELEASE_TYPE"
+          echo "  Branch: $BRANCH"
+          echo "  Prerelease: $IS_PRERELEASE"
+
+  build-and-release:
+    needs: detect-release-info
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [fabric, neoforge]
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.detect-release-info.outputs.branch }}
+          fetch-depth: 0
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: 🏗️ Setup Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: wrapper
+
+      - name: 🔧 Configure Build
+        run: |
+          # Update version in build.gradle
+          sed -i "s/version = \".*\"/version = \"${{ needs.detect-release-info.outputs.version }}\"/" build.gradle
+          
+          # Update Minecraft version in gradle.properties
+          sed -i "s/minecraft_version=.*/minecraft_version=${{ needs.detect-release-info.outputs.minecraft_version }}/" gradle.properties
+          
+          echo "📋 Build Configuration:"
+          echo "  Version: ${{ needs.detect-release-info.outputs.version }}"
+          echo "  Minecraft: ${{ needs.detect-release-info.outputs.minecraft_version }}"
+          echo "  Platform: ${{ matrix.platform }}"
+
+      - name: Build Project
+        run: ./gradlew :${{ matrix.platform }}:build --no-daemon
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p artifacts
+          
+          # Copy JAR files
+          cp ${{ matrix.platform }}/build/libs/*.jar artifacts/
+          
+          # Create platform-specific artifact names
+          for jar in artifacts/*.jar; do
+            if [[ "$jar" =~ duraping-${{ matrix.platform }}-.*\.jar$ ]]; then
+              mv "$jar" "artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
+            fi
+          done
+          
+          echo "Artifacts prepared:"
+          ls -la artifacts/
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.detect-release-info.outputs.version }}
+          release_name: DuraPing ${{ needs.detect-release-info.outputs.version }} (MC ${{ needs.detect-release-info.outputs.minecraft_version }})
+          body: |
+            ## DuraPing ${{ needs.detect-release-info.outputs.version }}
+            
+            **Minecraft Version:** ${{ needs.detect-release-info.outputs.minecraft_version }}
+            **Release Type:** ${{ needs.detect-release-info.outputs.release_type }}
+            **Platform:** ${{ matrix.platform }}
+            
+            ### Downloads
+            - **Fabric:** `duraping-fabric-${{ needs.detect-release-info.outputs.version }}.jar`
+            - **NeoForge:** `duraping-neoforge-${{ needs.detect-release-info.outputs.version }}.jar`
+            
+            ### Features
+            - ⚡ Durability monitoring and alerts
+            - 🔊 Sound, chat, and visual notifications
+            - 🔄 Auto-swap functionality
+            - ⚙️ Highly configurable
+            - 🎮 Multi-platform support (Fabric + NeoForge)
+            
+            ### Installation
+            1. Download the appropriate JAR for your mod loader
+            2. Place in your `mods` folder
+            3. Launch Minecraft and enjoy!
+          draft: false
+          prerelease: ${{ needs.detect-release-info.outputs.is_prerelease }}
+
+      - name: 📤 Upload Artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar
+          asset_name: duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar
+          asset_content_type: application/java-archive
+
+  notify-completion:
+    needs: [detect-release-info, build-and-release]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: 🎉 Release Complete
+        run: |
+          echo "🎉 Release ${{ needs.detect-release-info.outputs.version }} completed!"
+          echo "📦 Minecraft Version: ${{ needs.detect-release-info.outputs.minecraft_version }}"
+          echo "🏷️ Release Type: ${{ needs.detect-release-info.outputs.release_type }}"
+          echo "🌐 View at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.detect-release-info.outputs.version }}"
