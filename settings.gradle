@@ -37,4 +37,4 @@ plugins {
 rootProject.name = 'DuraPing'
 include('common')
 include('fabric')
-// include('neoforge') // Temporarily disabled for 1.21.9 testing
+include('neoforge')
