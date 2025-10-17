@@ -31,7 +31,7 @@ on:
         type: string
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2G -XX:+UseG1GC"
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+UseCompressedOops"
 
 jobs:
   detect-release-info:
@@ -123,10 +123,22 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: 📦 Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: 🏗️ Setup Gradle
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: wrapper
+          cache-read-only: false
+          cache-write-only: false
 
       - name: 🔧 Configure Build
         run: |
@@ -142,7 +154,7 @@ jobs:
           echo "  Platform: ${{ matrix.platform }}"
 
       - name: Build Project
-        run: ./gradlew :${{ matrix.platform }}:build --no-daemon
+        run: ./gradlew :${{ matrix.platform }}:build --no-daemon --parallel --build-cache
 
       - name: Prepare Artifacts
         run: |
