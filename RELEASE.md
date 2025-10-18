@@ -1,201 +1,178 @@
-# 🚀 DuraPing Release System
+# DuraPing Release Process
 
 ## Overview
-This repository includes a comprehensive, automated release system that handles multi-branch releases with minimal interaction required.
 
-## 🎯 Features
+DuraPing uses **Axion Release** for dynamic versioning based on git tags. The version is automatically determined from the most recent git tag, eliminating the need for manual version updates in build files.
 
-### ✨ **Automated Release Pipeline**
-- **Multi-branch support**: Release from `main` (1.21.10) and `stable/1.21.9` simultaneously
-- **Smart versioning**: Automatic version detection and tagging
-- **GitHub Actions integration**: Automated builds and releases
-- **Cross-platform scripts**: Works on Windows, Linux, and macOS
-- **Minimal interaction**: One command releases
+## Branch Structure
 
-### 🏷️ **Version Naming Convention**
-```
-v0.5.0-stable-1.21.9    ← Stable release for MC 1.21.9
-v0.5.0-stable-1.21.10   ← Stable release for MC 1.21.10
-v0.5.0-beta-1.21.10     ← Beta release for MC 1.21.10
-v0.5.0-rc-1.21.10       ← Release candidate for MC 1.21.10
-```
+- **`main`** - Minecraft 1.21.10 (latest)
+- **`stable/1.21.9`** - Minecraft 1.21.9 (stable)
+- **`dev/1.21.10`** - Development for MC 1.21.10
+- **`dev/1.21.9`** - Development for MC 1.21.9
 
-## 🚀 Quick Start
+## Version Format
 
-### **Option 1: Quick Release (Recommended)**
+Tags follow this format: `v{VERSION}-{TYPE}-{MC_VERSION}`
+
+Examples:
+- `v0.5.3-stable-1.21.10`
+- `v0.5.3-stable-1.21.9`
+- `v0.5.4-beta-1.21.10`
+- `v0.6.0-rc-1.21.10`
+
+## Release Process
+
+### Quick Release (Single Version)
+
+For a single Minecraft version:
+
 ```bash
-# Automatically detect current version and release
-./scripts/quick-release.sh
+# For MC 1.21.10 (main branch)
+./scripts/release.sh 0.5.3 stable 1.21.10
+
+# For MC 1.21.9 (stable/1.21.9 branch)
+./scripts/release.sh 0.5.3 stable 1.21.9
 ```
 
-### **Option 2: Dual Release (Both MC versions)**
+### Dual Release (Both Versions)
+
+To release for both Minecraft versions simultaneously:
+
 ```bash
-# Release both 1.21.9 and 1.21.10 simultaneously
-./scripts/dual-release.sh 0.5.0 stable
+./scripts/dual-release.sh 0.5.3 stable
 ```
 
-### **Option 3: Manual Release**
+This will:
+1. Create tag `v0.5.3-stable-1.21.9` on `stable/1.21.9` branch
+2. Create tag `v0.5.3-stable-1.21.10` on `main` branch
+3. Push both tags to trigger GitHub Actions
+
+### Manual Release
+
+You can also create tags manually:
+
 ```bash
-# Release specific version
-./scripts/release.sh 0.5.0 stable 1.21.10
+# Switch to the appropriate branch
+git checkout main  # or stable/1.21.9
+
+# Create the tag
+git tag v0.5.3-stable-1.21.10 -m "Release 0.5.3-stable-1.21.10"
+
+# Push the tag
+git push origin v0.5.3-stable-1.21.10
 ```
 
-## 📋 Release Types
+## How It Works
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `stable` | Production-ready release | `v0.5.0-stable-1.21.10` |
-| `beta` | Beta testing release | `v0.5.0-beta-1.21.10` |
-| `rc` | Release candidate | `v0.5.0-rc-1.21.10` |
+### 1. Axion Release (Dynamic Versioning)
 
-## 🏗️ GitHub Actions Workflow
+The `build.gradle` uses axion to determine the version from git tags:
 
-The system automatically:
-1. **Detects release information** from tags or manual dispatch
-2. **Builds for both platforms** (Fabric + NeoForge)
-3. **Creates GitHub releases** with proper naming
-4. **Uploads JAR artifacts** with clean naming
-5. **Sends notifications** on completion
+```groovy
+scmVersion {
+    tag {
+        prefix = "v"
+    }
+    useHighestVersion = true
+    ignoreUncommittedChanges = true
+}
 
-### **Trigger Methods**
-- **Tag push**: `git tag v0.5.0-stable-1.21.10 && git push origin v0.5.0-stable-1.21.10`
-- **Manual dispatch**: GitHub Actions → Run workflow
-- **Script execution**: Automated via release scripts
-
-## 📦 Artifact Naming
-
-### **Generated JARs**
-```
-duraping-fabric-0.5.0-stable-1.21.10.jar
-duraping-neoforge-0.5.0-stable-1.21.10.jar
+version = scmVersion.version
 ```
 
-### **Release Assets**
-- **Fabric JAR**: `duraping-fabric-{version}.jar`
-- **NeoForge JAR**: `duraping-neoforge-{version}.jar`
-- **Source JARs**: `duraping-{platform}-{version}-sources.jar`
-- **Javadoc JARs**: `duraping-{platform}-{version}-javadoc.jar`
+**No manual version updates needed!** Axion reads the version from the git tag automatically.
 
-## 🔧 Configuration
+### 2. GitHub Actions Workflow
 
-### **Branch Mapping**
-- `main` → Minecraft 1.21.10 (latest)
-- `stable/1.21.9` → Minecraft 1.21.9 (stable)
+When a tag matching `v*-stable-*`, `v*-beta-*`, or `v*-rc-*` is pushed:
 
-### **Build Configuration**
-- **Java**: OpenJDK 21
-- **Gradle**: Wrapper version
-- **Platforms**: Fabric + NeoForge
-- **Artifacts**: JAR, Sources, Javadoc
+1. **Detect Release Info** - Extracts version, Minecraft version, and release type from tag
+2. **Build Artifacts** - Builds both Fabric and NeoForge JARs in parallel
+3. **Create Release** - Creates a single GitHub release with both JARs attached
+4. **Notify Completion** - Outputs release information
 
-## 🎮 Usage Examples
+### 3. Tag Format Parsing
 
-### **Release Stable for Both Versions**
+The workflow automatically parses tags:
+
+- `v0.5.3-stable-1.21.10` → version: `0.5.3-stable-1.21.10`, MC: `1.21.10`, type: `stable`
+- `v0.5.3-stable-1.21.9` → version: `0.5.3-stable-1.21.9`, MC: `1.21.9`, type: `stable`
+- `v0.6.0-beta-1.21.10` → version: `0.6.0-beta-1.21.10`, MC: `1.21.10`, type: `beta`
+
+## Release Checklist
+
+- [ ] Ensure all changes are committed and pushed
+- [ ] Verify CI builds pass on target branch
+- [ ] Choose version number following semantic versioning
+- [ ] Run release script for desired MC version(s)
+- [ ] Verify GitHub Actions workflow completes successfully
+- [ ] Check that release appears in GitHub Releases with both JARs
+
+## Troubleshooting
+
+### GPG Signing Issues
+
+If you encounter GPG signing errors with tags:
+
 ```bash
-# Release 0.5.0 stable for both MC versions
-./scripts/dual-release.sh 0.5.0 stable
+# Temporarily disable GPG signing
+git config --local tag.gpgSign false
+
+# Create tag without signature
+git tag v0.5.3-stable-1.21.10 -m "Release message"
+
+# Push tag
+git push origin v0.5.3-stable-1.21.10
 ```
 
-### **Release Beta for Latest**
+### Version Not Detected
+
+If axion isn't detecting the version:
+
 ```bash
-# Release 0.5.0 beta for MC 1.21.10
-./scripts/release.sh 0.5.0 beta 1.21.10
+# Check current version axion will use
+./gradlew currentVersion
+
+# List recent tags
+git tag --list | sort -V | tail -5
+
+# Ensure you're on the right branch
+git branch --show-current
 ```
 
-### **Quick Release (Auto-detect)**
-```bash
-# Automatically detect and release
-./scripts/quick-release.sh
-```
+### Build Failures
 
-## 🛠️ Advanced Usage
+If GitHub Actions build fails:
 
-### **Manual GitHub Actions Dispatch**
-1. Go to **Actions** → **Multi-Branch Release Pipeline**
-2. Click **Run workflow**
-3. Select parameters:
-   - **Release type**: `stable`, `beta`, or `rc`
-   - **Minecraft version**: `1.21.9` or `1.21.10`
-   - **Custom version**: Optional override
+1. Check the Actions tab for detailed logs
+2. Verify `gradle.properties` has correct Minecraft version for the branch
+3. Ensure dependencies are available and versions are correct
+4. Test build locally: `./gradlew :fabric:build :neoforge:build`
 
-### **Custom Version Override**
-```bash
-# Use custom version format
-./scripts/release.sh 0.5.1-hotfix stable 1.21.10
-```
+## Best Practices
 
-## 📊 Release Monitoring
+1. **Always tag from the correct branch**
+   - Use `main` for 1.21.10 releases
+   - Use `stable/1.21.9` for 1.21.9 releases
 
-### **GitHub Actions Dashboard**
-- **URL**: `https://github.com/{owner}/{repo}/actions`
-- **Workflow**: "Multi-Branch Release Pipeline"
-- **Status**: Real-time build progress
+2. **Keep version numbers in sync** across MC versions
+   - `v0.5.3-stable-1.21.10` and `v0.5.3-stable-1.21.9` should have the same base version
 
-### **Release Pages**
-- **URL**: `https://github.com/{owner}/{repo}/releases`
-- **Assets**: Download JARs and documentation
+3. **Test before releasing**
+   - Run local builds to verify everything works
+   - Check lint errors: `./gradlew check`
 
-## 🔍 Troubleshooting
+4. **Use semantic versioning**
+   - `MAJOR.MINOR.PATCH` format
+   - Increment PATCH for bug fixes
+   - Increment MINOR for new features
+   - Increment MAJOR for breaking changes
 
-### **Common Issues**
+5. **Write meaningful release notes**
+   - The workflow generates basic notes automatically
+   - Edit the GitHub release after creation to add changelog details
 
-#### **Uncommitted Changes**
-```bash
-# Error: Uncommitted changes detected
-# Solution: Commit or stash changes first
-git add .
-git commit -m "feat: your changes"
-```
+## Advanced: Multi-Platform Publishing
 
-#### **Wrong Branch**
-```bash
-# Error: Not on correct branch
-# Solution: Script automatically switches branches
-```
-
-#### **Tag Already Exists**
-```bash
-# Error: Tag already exists
-# Solution: Use different version or delete existing tag
-git tag -d v0.5.0-stable-1.21.10
-git push origin --delete v0.5.0-stable-1.21.10
-```
-
-## 🎯 Best Practices
-
-### **Release Workflow**
-1. **Develop features** in `dev/*` branches
-2. **Merge to stable** branches when ready
-3. **Run release scripts** for automated releases
-4. **Monitor GitHub Actions** for build progress
-5. **Verify releases** on GitHub releases page
-
-### **Version Management**
-- **Semantic versioning**: `MAJOR.MINOR.PATCH`
-- **MC version suffix**: `-1.21.9` or `-1.21.10`
-- **Release type**: `-stable`, `-beta`, `-rc`
-
-### **Branch Strategy**
-- **`main`**: Latest stable (1.21.10)
-- **`stable/1.21.9`**: Legacy stable (1.21.9)
-- **`dev/*`**: Development branches
-- **Feature branches**: `feat/*`, `fix/*`
-
-## 🚀 Future Enhancements
-
-### **Planned Features**
-- **Automatic changelog generation**
-- **Release notes from commits**
-- **Dependency updates**
-- **Security scanning**
-- **Performance metrics**
-
-### **Integration Options**
-- **Modrinth publishing**
-- **CurseForge publishing**
-- **Discord notifications**
-- **Slack integration**
-
----
-
-*Built with ❤️ for the Minecraft modding community*
+For publishing to CurseForge/Modrinth, additional configuration is needed in the mod-specific build files. This is handled separately from the GitHub release process.

@@ -40,32 +40,14 @@ if not "%CURRENT_BRANCH%"=="%BRANCH%" (
     git checkout %BRANCH%
 )
 
-REM Check for uncommitted changes
+REM Check for uncommitted changes (warn only)
 git diff-index --quiet HEAD --
 if errorlevel 1 (
-    echo ❌ Uncommitted changes detected!
-    echo Please commit or stash your changes before releasing.
-    exit /b 1
+    echo ⚠️  Note: Uncommitted changes detected.
+    echo The release will use the current committed state.
 )
 
-REM Update version in build.gradle
-echo 📝 Updating version in build.gradle...
-powershell -Command "(Get-Content build.gradle) -replace 'version = \".*\"', 'version = \"%FULL_VERSION%\"' | Set-Content build.gradle"
-
-REM Update Minecraft version in gradle.properties
-echo 📝 Updating Minecraft version in gradle.properties...
-powershell -Command "(Get-Content gradle.properties) -replace 'minecraft_version=.*', 'minecraft_version=%MC_VERSION%' | Set-Content gradle.properties"
-
-REM Commit version changes
-echo 💾 Committing version changes...
-git add build.gradle gradle.properties
-git commit -S -m "chore: bump version to %FULL_VERSION%
-
-- Update version to %FULL_VERSION%
-- Update Minecraft version to %MC_VERSION%
-- Prepare for %TYPE% release"
-
-REM Create and push tag
+REM Create and push tag (axion will handle versioning automatically)
 echo 🏷️  Creating tag %TAG_NAME%...
 git tag -s %TAG_NAME% -m "Release %FULL_VERSION% - DuraPing for Minecraft %MC_VERSION%"
 

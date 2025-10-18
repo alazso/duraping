@@ -9,25 +9,23 @@ plugins {
     id 'me.modmuss50.mod-publish-plugin' version '0.7.4' apply false
 }
 
-// Configure Axion Release
+// Configure Axion Release - Dynamic versioning from git tags
 scmVersion {
     tag {
         prefix = "v"
+        // Tag format: v0.5.3-stable-1.21.10
+        // Axion will extract version from the most recent tag
     }
-    // Support for beta tags: v0.5.0-beta, v0.5.1-beta, etc.
-    // Stable tags: v0.5.0, v0.5.1, etc.
-    // Create tags manually: git tag -a v0.5.0-beta -m "Release 0.5.0-beta"
+    // Use the exact tag version without incrementing
     versionIncrementer 'incrementMinor'
-    // Disable branch version incrementer for parallel release tracks
-    branchVersionIncrementer = [:]
     // Don't append branch name to version
     useHighestVersion = true
-    // Use exact tag version for parallel releases
+    // Allow builds with uncommitted changes (for CI)
     ignoreUncommittedChanges = true
 }
 
-// Set version manually for parallel release tracks
-version = "0.5.3-stable-1.21.10"
+// Use axion's dynamic version from git tags
+version = scmVersion.version
 
 allprojects {
     repositories {

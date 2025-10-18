@@ -149,10 +149,7 @@ jobs:
 
       - name: Configure Build
         run: |
-          # Update version in build.gradle
-          sed -i "s/version = \".*\"/version = \"${{ needs.detect-release-info.outputs.version }}\"/" build.gradle
-          
-          # Update Minecraft version in gradle.properties
+          # Update Minecraft version in gradle.properties (axion handles version from tag)
           sed -i "s/minecraft_version=.*/minecraft_version=${{ needs.detect-release-info.outputs.minecraft_version }}/" gradle.properties
           
           echo "Building ${{ matrix.platform }} for version ${{ needs.detect-release-info.outputs.version }}"

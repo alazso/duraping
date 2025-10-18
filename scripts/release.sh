@@ -27,7 +27,7 @@ fi
 FULL_VERSION="${VERSION}-${TYPE}-${MC_VERSION}"
 TAG_NAME="v${FULL_VERSION}"
 
-echo -e "${BLUE}🚀 DuraPing Release Automation${NC}"
+echo -e "${BLUE}DuraPing Release Automation${NC}"
 echo -e "${BLUE}================================${NC}"
 echo -e "Version: ${GREEN}${FULL_VERSION}${NC}"
 echo -e "Type: ${GREEN}${TYPE}${NC}"
@@ -43,38 +43,20 @@ if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
     git checkout "$BRANCH"
 fi
 
-# Check for uncommitted changes
+# Check for uncommitted changes (warn only)
 if ! git diff-index --quiet HEAD --; then
-    echo -e "${RED}❌ Uncommitted changes detected!${NC}"
-    echo -e "${YELLOW}Please commit or stash your changes before releasing.${NC}"
-    exit 1
+    echo -e "${YELLOW}⚠️  Note: Uncommitted changes detected.${NC}"
+    echo -e "${YELLOW}The release will use the current committed state.${NC}"
 fi
 
-# Update version in build.gradle
-echo -e "${BLUE}📝 Updating version in build.gradle...${NC}"
-sed -i "s/version = \".*\"/version = \"${FULL_VERSION}\"/" build.gradle
-
-# Update Minecraft version in gradle.properties
-echo -e "${BLUE}📝 Updating Minecraft version in gradle.properties...${NC}"
-sed -i "s/minecraft_version=.*/minecraft_version=${MC_VERSION}/" gradle.properties
-
-# Commit version changes
-echo -e "${BLUE}💾 Committing version changes...${NC}"
-git add build.gradle gradle.properties
-git commit -S -m "chore: bump version to ${FULL_VERSION}
-
-- Update version to ${FULL_VERSION}
-- Update Minecraft version to ${MC_VERSION}
-- Prepare for ${TYPE} release"
-
-# Create and push tag
-echo -e "${BLUE}🏷️  Creating tag ${TAG_NAME}...${NC}"
+# Create and push tag (axion will handle versioning automatically)
+echo -e "${BLUE}Creating tag ${TAG_NAME}...${NC}"
 git tag -s "$TAG_NAME" -m "Release ${FULL_VERSION} - DuraPing for Minecraft ${MC_VERSION}"
 
-echo -e "${BLUE}📤 Pushing changes and tag...${NC}"
+echo -e "${BLUE}Pushing changes and tag...${NC}"
 git push origin "$BRANCH"
 git push origin "$TAG_NAME"
 
-echo -e "${GREEN}✅ Release ${FULL_VERSION} initiated!${NC}"
-echo -e "${BLUE}🌐 GitHub Actions will now build and publish the release.${NC}"
-echo -e "${BLUE}📋 Monitor progress at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^.]*\).*/\1/')/actions${NC}"
+echo -e "${GREEN}Release ${FULL_VERSION} initiated!${NC}"
+echo -e "${BLUE}GitHub Actions will now build and publish the release.${NC}"
+echo -e "${BLUE}Monitor progress at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^.]*\).*/\1/')/actions${NC}"
