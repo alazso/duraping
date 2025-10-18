@@ -1,4 +1,4 @@
-name: 🚀 Multi-Branch Release Pipeline
+name: Multi-Branch Release Pipeline
 
 on:
   push:
@@ -47,7 +47,7 @@ jobs:
       is_prerelease: ${{ steps.detect.outputs.is_prerelease }}
       branch: ${{ steps.detect.outputs.branch }}
     steps:
-      - name: 🔍 Detect Release Information
+      - name: Detect Release Information
         id: detect
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -101,33 +101,36 @@ jobs:
           echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
           
-          echo "🎯 Release Info:"
+          echo "Release Info:"
           echo "  Version: $VERSION"
           echo "  Minecraft: $MC_VERSION"
           echo "  Type: $RELEASE_TYPE"
           echo "  Branch: $BRANCH"
           echo "  Prerelease: $IS_PRERELEASE"
 
-  build-and-release:
+  build-artifacts:
     needs: detect-release-info
     runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [fabric, neoforge]
+    outputs:
+      fabric-jar: ${{ steps.artifacts.outputs.fabric-jar }}
+      neoforge-jar: ${{ steps.artifacts.outputs.neoforge-jar }}
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.detect-release-info.outputs.branch }}
           fetch-depth: 0
 
-      - name: ☕ Setup Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: 📦 Cache Dependencies
+      - name: Cache Dependencies
         uses: actions/cache@v3
         with:
           path: |
@@ -137,14 +140,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: 🏗️ Setup Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
           cache-read-only: false
           cache-write-only: false
 
-      - name: 🔧 Configure Build
+      - name: Configure Build
         run: |
           # Update version in build.gradle
           sed -i "s/version = \".*\"/version = \"${{ needs.detect-release-info.outputs.version }}\"/" build.gradle
@@ -152,59 +155,68 @@ jobs:
           # Update Minecraft version in gradle.properties
           sed -i "s/minecraft_version=.*/minecraft_version=${{ needs.detect-release-info.outputs.minecraft_version }}/" gradle.properties
           
-          echo "📋 Build Configuration:"
-          echo "  Version: ${{ needs.detect-release-info.outputs.version }}"
-          echo "  Minecraft: ${{ needs.detect-release-info.outputs.minecraft_version }}"
-          echo "  Platform: ${{ matrix.platform }}"
+          echo "Building ${{ matrix.platform }} for version ${{ needs.detect-release-info.outputs.version }}"
 
       - name: Build Project
         run: ./gradlew :${{ matrix.platform }}:build --no-daemon --parallel --build-cache
 
       - name: Prepare Artifacts
+        id: artifacts
         run: |
           mkdir -p artifacts
-          
-          # Copy JAR files
           cp ${{ matrix.platform }}/build/libs/*.jar artifacts/
           
-          # Create platform-specific artifact names (only if needed)
+          # Rename to standard format
           for jar in artifacts/*.jar; do
             if [[ "$jar" =~ duraping-${{ matrix.platform }}-.*\.jar$ ]]; then
-              new_name="artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
-              if [[ "$jar" != "$new_name" ]]; then
-                mv "$jar" "$new_name"
-              fi
+              mv "$jar" "artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
             fi
           done
-          
-          echo "Artifacts prepared:"
-          ls -la artifacts/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-jar
+          path: artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar
+          retention-days: 1
+
+  create-release:
+    needs: [detect-release-info, build-artifacts]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.detect-release-info.outputs.branch }}
+          fetch-depth: 0
+
+      - name: Download Fabric Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: fabric-jar
+          path: artifacts/
+
+      - name: Download NeoForge Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: neoforge-jar
+          path: artifacts/
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.detect-release-info.outputs.version }}
-          release_name: DuraPing ${{ needs.detect-release-info.outputs.version }} (MC ${{ needs.detect-release-info.outputs.minecraft_version }})
+          name: DuraPing ${{ needs.detect-release-info.outputs.version }} (MC ${{ needs.detect-release-info.outputs.minecraft_version }})
           body: |
             ## DuraPing ${{ needs.detect-release-info.outputs.version }}
             
             **Minecraft Version:** ${{ needs.detect-release-info.outputs.minecraft_version }}
             **Release Type:** ${{ needs.detect-release-info.outputs.release_type }}
-            **Platform:** ${{ matrix.platform }}
             
             ### Downloads
             - **Fabric:** `duraping-fabric-${{ needs.detect-release-info.outputs.version }}.jar`
             - **NeoForge:** `duraping-neoforge-${{ needs.detect-release-info.outputs.version }}.jar`
-            
-            ### Features
-            - ⚡ Durability monitoring and alerts
-            - 🔊 Sound, chat, and visual notifications
-            - 🔄 Auto-swap functionality
-            - ⚙️ Highly configurable
-            - 🎮 Multi-platform support (Fabric + NeoForge)
             
             ### Installation
             1. Download the appropriate JAR for your mod loader
@@ -212,25 +224,18 @@ jobs:
             3. Launch Minecraft and enjoy!
           draft: false
           prerelease: ${{ needs.detect-release-info.outputs.is_prerelease }}
-
-      - name: 📤 Upload Artifacts
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar
-          asset_name: duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar
-          asset_content_type: application/java-archive
+          files: |
+            artifacts/duraping-fabric-${{ needs.detect-release-info.outputs.version }}.jar
+            artifacts/duraping-neoforge-${{ needs.detect-release-info.outputs.version }}.jar
 
   notify-completion:
-    needs: [detect-release-info, build-and-release]
+    needs: [detect-release-info, build-artifacts, create-release]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: 🎉 Release Complete
+      - name: Release Complete
         run: |
-          echo "🎉 Release ${{ needs.detect-release-info.outputs.version }} completed!"
-          echo "📦 Minecraft Version: ${{ needs.detect-release-info.outputs.minecraft_version }}"
-          echo "🏷️ Release Type: ${{ needs.detect-release-info.outputs.release_type }}"
-          echo "🌐 View at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.detect-release-info.outputs.version }}"
+          echo "Release ${{ needs.detect-release-info.outputs.version }} completed!"
+          echo "Minecraft Version: ${{ needs.detect-release-info.outputs.minecraft_version }}"
+          echo "Release Type: ${{ needs.detect-release-info.outputs.release_type }}"
+          echo "View at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.detect-release-info.outputs.version }}"
