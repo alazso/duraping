@@ -163,10 +163,13 @@ jobs:
           mkdir -p artifacts
           cp ${{ matrix.platform }}/build/libs/*.jar artifacts/
           
-          # Rename to standard format
+          # Rename to standard format if needed
           for jar in artifacts/*.jar; do
             if [[ "$jar" =~ duraping-${{ matrix.platform }}-.*\.jar$ ]]; then
-              mv "$jar" "artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
+              target="artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
+              if [[ "$jar" != "$target" ]]; then
+                mv "$jar" "$target"
+              fi
             fi
           done
 
