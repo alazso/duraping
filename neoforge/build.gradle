@@ -42,15 +42,6 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-tasks.jar.doFirst {
-    def modsTomlFile = file("$buildDir/resources/main/META-INF/neoforge.mods.toml")
-    if (modsTomlFile.exists()) {
-        def content = modsTomlFile.text
-        content = content.replace('version = "unspecified"', "version = \"${rootProject.version}\"")
-        modsTomlFile.text = content
-    }
-}
-
 publishMods {
     file = tasks.jar.archiveFile
     changelog = providers.fileContents(layout.projectDirectory.file("../../CHANGELOG.md")).asText
