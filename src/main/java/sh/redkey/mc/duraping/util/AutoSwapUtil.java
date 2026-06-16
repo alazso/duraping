@@ -249,7 +249,12 @@ public class AutoSwapUtil {
             
             // Check if item is suitable for this slot
             if (!isItemSuitableForSlot(stack, slot)) continue;
-            
+
+            // Hand slots only swap to the same item type (a pickaxe for a pickaxe),
+            // matching the tick-based tool path. Armor still allows any matching piece.
+            if ((slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND)
+                    && stack.getItem() != currentItem.getItem()) continue;
+
             // Check quality compatibility
             if (!cfg.autoSwapAllowLowerQuality && isLowerQuality(currentItem, stack)) continue;
             
@@ -383,7 +388,11 @@ public class AutoSwapUtil {
     private static boolean canManipulateInventory(Player player) {
         Minecraft client = Minecraft.getInstance();
         if (client.gameMode == null || client.player == null) return false;
-        return player == client.player && player.containerMenu == player.inventoryMenu;
+        // Only the player's own inventory menu, and only when nothing is on the cursor
+        // (the pick-up/place sequence assumes an empty cursor).
+        return player == client.player
+                && player.containerMenu == player.inventoryMenu
+                && player.inventoryMenu.getCarried().isEmpty();
     }
     
     public static void manualAutoSwap(Player player) {
