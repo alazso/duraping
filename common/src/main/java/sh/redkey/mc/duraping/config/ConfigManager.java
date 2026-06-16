@@ -2,6 +2,7 @@ package sh.redkey.mc.duraping.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import sh.redkey.mc.duraping.Constants;
 import sh.redkey.mc.duraping.platform.Services;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class ConfigManager {
                 if (cfg == null) cfg = new DuraPingConfig();
                 DuraPingConfig.set(cfg);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { Constants.LOG.error("Failed to load DuraPing config", e); }
     }
 
     public static void save() {
@@ -34,7 +35,7 @@ public class ConfigManager {
             try (var w = new FileWriter(f)) {
                 GSON.toJson(DuraPingConfig.get(), w);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { Constants.LOG.error("Failed to save DuraPing config", e); }
     }
 }
 

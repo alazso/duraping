@@ -22,7 +22,6 @@ public class DuraPingFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        Constants.LOG.info("Hello Fabric world!");
         DuraPing.init();
 
         // Register keybindings

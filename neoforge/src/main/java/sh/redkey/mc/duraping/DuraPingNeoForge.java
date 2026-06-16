@@ -6,11 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -28,16 +25,8 @@ public class DuraPingNeoForge {
     private static KeyMapping autoSwapArmorKey;
 
     public DuraPingNeoForge(IEventBus modBus) {
-        Constants.LOG.info("Hello NeoForge world!");
-        
-        modBus.addListener(this::commonSetup);
         modBus.addListener(this::clientSetup);
         modBus.addListener(this::registerKeyMappings);
-    }
-
-    private void commonSetup(FMLCommonSetupEvent event) {
-        // Sound events are registered automatically by NeoForge
-        // No manual registration needed
     }
 
     private void clientSetup(FMLClientSetupEvent event) {

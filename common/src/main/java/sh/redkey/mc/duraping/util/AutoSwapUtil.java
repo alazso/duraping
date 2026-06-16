@@ -2,12 +2,14 @@ package sh.redkey.mc.duraping.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.tags.ItemTags;
+import sh.redkey.mc.duraping.Constants;
 import sh.redkey.mc.duraping.DuraPing;
 import sh.redkey.mc.duraping.config.DuraPingConfig;
 
@@ -43,8 +45,8 @@ public class AutoSwapUtil {
             
             // Check threshold
             if (durabilityPercent <= cfg.autoSwapThreshold) {
-                System.out.println("[DuraPing] Armor " + slot.getName() + " below threshold: " + 
-                                  currentArmor.getHoverName().getString() + " at " + durabilityPercent + "%");
+                Constants.LOG.debug("Armor {} below threshold: {} at {}%",
+                        slot.getName(), currentArmor.getHoverName().getString(), durabilityPercent);
                 attemptAutoSwap(player, slot);
             }
         }
@@ -94,28 +96,19 @@ public class AutoSwapUtil {
             );
             player.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
             
-            System.out.println("[DuraPing] Auto-swapped from slot " + (currentSlot + 1) + " to slot " + (newSlot + 1));
+            Constants.LOG.debug("Auto-swapped from slot {} to slot {}", currentSlot + 1, newSlot + 1);
         }
     }
     
     /**
-     * Find which hotbar slot contains the given item
-     */
-    private static int findSlotForItem(Player player, ItemStack item) {
-        for (int i = 0; i < 9; i++) {
-            if (player.getInventory().getItem(i) == item) {
-                return i;
-            }
-        }
-        return 0; // Default to first slot if not found
-    }
-    
-    /**
-     * Switch to a hotbar slot - uses direct method call for cross-platform compatibility
+     * Switch the held hotbar slot, and tell the server so it stops damaging the old item.
      */
     private static void switchHotbarSlot(Player player, int slot) {
-        // Use the direct method to set the selected slot
         player.getInventory().setSelectedSlot(slot);
+        var connection = Minecraft.getInstance().getConnection();
+        if (connection != null) {
+            connection.send(new ServerboundSetCarriedItemPacket(slot));
+        }
     }
     
     /**
@@ -148,7 +141,7 @@ public class AutoSwapUtil {
         
         // If found in hotbar, return it (simple slot switch)
         if (bestSlot != -1) {
-            System.out.println("[DuraPing] Found better item in hotbar slot " + (bestSlot + 1));
+            Constants.LOG.debug("Found better item in hotbar slot {}", bestSlot + 1);
             return bestSlot;
         }
         
@@ -174,29 +167,26 @@ public class AutoSwapUtil {
             }
         }
         
-        // If found in main inventory, swap it into the current hotbar slot using server-synced method
+        // If found in main inventory, swap it into the current hotbar slot with a
+        // server-synced container click.
         if (bestInventorySlot != -1) {
-            System.out.println("[DuraPing] Found better item in inventory slot " + bestInventorySlot + ", swapping with server sync");
-            
-            // Use the Minecraft client's interaction manager to perform server-synchronized swap
-            // This prevents client-server desync issues!
+            if (!canManipulateInventory(player)) return -1;
+            Constants.LOG.debug("Found better item in inventory slot {}, swapping with server sync", bestInventorySlot);
+
             Minecraft client = Minecraft.getInstance();
-            if (client.gameMode != null && client.player != null) {
-                // Perform server-synchronized SWAP click
-                // This sends a packet to the server and waits for confirmation
-                client.gameMode.handleInventoryMouseClick(
-                    client.player.containerMenu.containerId,
-                    bestInventorySlot,
-                    currentSlot,
-                    ClickType.SWAP,
-                    client.player
-                );
-            }
-            
-            // Return current slot (swap operation will place item there)
+            // SWAP moves the main-inventory item (menu slot 9-35) into hotbar slot currentSlot.
+            client.gameMode.handleInventoryMouseClick(
+                player.inventoryMenu.containerId,
+                bestInventorySlot,
+                currentSlot,
+                ClickType.SWAP,
+                player
+            );
+
+            // The better item now occupies the current hotbar slot.
             return currentSlot;
         }
-        
+
         return -1; // No suitable replacement found
     }
     
@@ -230,12 +220,12 @@ public class AutoSwapUtil {
         // Find best replacement item
         ItemStack replacement = findBestReplacement(player, currentItem, slot, cfg);
         if (replacement.isEmpty()) {
-            System.out.println("[DuraPing] No suitable replacement found for " + currentItem.getHoverName().getString());
+            Constants.LOG.debug("No suitable replacement found for {}", currentItem.getHoverName().getString());
             return false;
         }
         
-        System.out.println("[DuraPing] Found replacement: " + replacement.getHoverName().getString() + 
-                          " (" + (replacement.getMaxDamage() - replacement.getDamageValue()) + "/" + replacement.getMaxDamage() + ")");
+        Constants.LOG.debug("Found replacement: {} ({}/{})", replacement.getHoverName().getString(),
+                replacement.getMaxDamage() - replacement.getDamageValue(), replacement.getMaxDamage());
         
         // Perform the swap
         return performSwap(player, slot, currentItem, replacement);
@@ -252,8 +242,8 @@ public class AutoSwapUtil {
     private static ItemStack findBestReplacement(Player player, ItemStack currentItem, EquipmentSlot slot, DuraPingConfig cfg) {
         List<ItemStack> candidates = new ArrayList<>();
         
-        // Search inventory for suitable replacements
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+        // Search the hotbar and main inventory (raw indices 0-35) for suitable replacements.
+        for (int i = 0; i <= 35; i++) {
             ItemStack stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || !stack.isDamageableItem()) continue;
             
@@ -271,8 +261,8 @@ public class AutoSwapUtil {
             int minRequiredDurability = currentDurability + (currentItem.getMaxDamage() / 10);
             
             if (replacementDurability >= minRequiredDurability) {
-                System.out.println("[DuraPing] Candidate found at slot " + i + ": " + stack.getHoverName().getString() + 
-                                 " (" + replacementDurability + "/" + stack.getMaxDamage() + ")");
+                Constants.LOG.debug("Candidate found at slot {}: {} ({}/{})", i, stack.getHoverName().getString(),
+                        replacementDurability, stack.getMaxDamage());
                 candidates.add(stack);
             }
         }
@@ -307,56 +297,93 @@ public class AutoSwapUtil {
     
     private static boolean performSwap(Player player, EquipmentSlot slot, ItemStack currentItem, ItemStack replacement) {
         try {
-            // Find the replacement item in inventory
-            int replacementSlot = -1;
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            if (!canManipulateInventory(player)) return false;
+
+            // Locate the replacement in the hotbar or main inventory (raw indices 0-35).
+            int replacementInvIndex = -1;
+            for (int i = 0; i <= 35; i++) {
                 if (player.getInventory().getItem(i) == replacement) {
-                    replacementSlot = i;
+                    replacementInvIndex = i;
                     break;
                 }
             }
-            
-            if (replacementSlot == -1) return false;
-            
-            // CRITICAL: Copy the items BEFORE any modifications
-            // Get the actual equipped item fresh to ensure we have the right data
-            ItemStack actualCurrentItem = player.getItemBySlot(slot);
-            ItemStack tempCurrent = actualCurrentItem.copy();
-            ItemStack tempReplacement = replacement.copy();
-            
-            System.out.println("[DuraPing] Swapping: " + tempCurrent.getHoverName().getString() + 
-                             " (" + (tempCurrent.getMaxDamage() - tempCurrent.getDamageValue()) + "/" + tempCurrent.getMaxDamage() + ")" +
-                             " with " + tempReplacement.getHoverName().getString() + 
-                             " (" + (tempReplacement.getMaxDamage() - tempReplacement.getDamageValue()) + "/" + tempReplacement.getMaxDamage() + ")");
-            
-            // Perform the actual swap using Minecraft's inventory operations
-            // First, put the current equipped item into the replacement's inventory slot
-            player.getInventory().setItem(replacementSlot, tempCurrent);
-            // Then equip the replacement item
-            player.setItemSlot(slot, tempReplacement);
-            
-            // Send feedback to player
-            String message = String.format("Auto-swapped %s (%.0f%% durability) with %s (%.0f%% durability)", 
-                tempCurrent.getHoverName().getString(),
-                ((double)(tempCurrent.getMaxDamage() - tempCurrent.getDamageValue()) / tempCurrent.getMaxDamage()) * 100,
-                tempReplacement.getHoverName().getString(),
-                ((double)(tempReplacement.getMaxDamage() - tempReplacement.getDamageValue()) / tempReplacement.getMaxDamage()) * 100
-            );
-            
-            DuraPing.toast("Auto-swap: " + tempReplacement.getHoverName().getString());
-            // Send message to player (client-side only)
-            player.displayClientMessage(Component.literal("§6[DuraPing] " + message), false);
-            
-            // Update cooldown
+            if (replacementInvIndex == -1) return false;
+
+            int srcMenuSlot = containerMenuSlot(replacementInvIndex);
+            if (srcMenuSlot == -1) return false;
+
+            ItemStack oldStack = player.getItemBySlot(slot).copy();
+            ItemStack newStack = replacement.copy();
+
+            Constants.LOG.debug("Swapping {} ({}/{}) for {} ({}/{})",
+                    oldStack.getHoverName().getString(),
+                    oldStack.getMaxDamage() - oldStack.getDamageValue(), oldStack.getMaxDamage(),
+                    newStack.getHoverName().getString(),
+                    newStack.getMaxDamage() - newStack.getDamageValue(), newStack.getMaxDamage());
+
+            Minecraft client = Minecraft.getInstance();
+            int containerId = player.inventoryMenu.containerId;
+
+            if (slot == EquipmentSlot.MAINHAND) {
+                // Move the replacement into the held hotbar slot with one server-synced SWAP.
+                int selected = player.getInventory().getSelectedSlot();
+                client.gameMode.handleInventoryMouseClick(containerId, srcMenuSlot, selected, ClickType.SWAP, player);
+            } else {
+                int armorSlot = armorMenuSlot(slot);
+                if (armorSlot == -1) return false;
+                // Emulate the manual pick up / place / put back sequence, each click server-synced:
+                // grab the replacement, drop it onto the worn piece (picking the worn piece up),
+                // then drop the worn piece into the now-empty source slot.
+                client.gameMode.handleInventoryMouseClick(containerId, srcMenuSlot, 0, ClickType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(containerId, armorSlot, 0, ClickType.PICKUP, player);
+                client.gameMode.handleInventoryMouseClick(containerId, srcMenuSlot, 0, ClickType.PICKUP, player);
+            }
+
+            DuraPing.toast("Auto-swap: " + newStack.getHoverName().getString());
+            player.displayClientMessage(Component.literal("§6[DuraPing] Auto-swapped "
+                    + oldStack.getHoverName().getString() + " for " + newStack.getHoverName().getString()), false);
+
             String itemId = currentItem.getItem().toString() + "_" + currentItem.getMaxDamage();
             String cooldownKey = slot.getName() + "_" + player.getStringUUID() + "_" + itemId;
             lastArmorSwapTime.put(cooldownKey, System.currentTimeMillis());
-            
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Constants.LOG.error("Auto-swap failed", e);
             return false;
         }
+    }
+
+    /**
+     * Map a raw hotbar/main-inventory index (0-35) to its slot index in the player's
+     * inventory menu, which is what {@code handleInventoryMouseClick} expects.
+     * Hotbar (0-8) lives at menu slots 36-44; the main inventory (9-35) is unchanged.
+     */
+    private static int containerMenuSlot(int invIndex) {
+        if (invIndex >= 0 && invIndex <= 8) return 36 + invIndex;
+        if (invIndex >= 9 && invIndex <= 35) return invIndex;
+        return -1;
+    }
+
+    /** Inventory-menu slot index for each worn armor piece (head 5, chest 6, legs 7, feet 8). */
+    private static int armorMenuSlot(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> 5;
+            case CHEST -> 6;
+            case LEGS -> 7;
+            case FEET -> 8;
+            default -> -1;
+        };
+    }
+
+    /**
+     * Auto-swap drives the inventory through server-synced container clicks, which are only
+     * valid against the player's own inventory menu. Bail if another container (a chest, etc.)
+     * is open: the slot indices would differ and we must not disturb an open GUI.
+     */
+    private static boolean canManipulateInventory(Player player) {
+        Minecraft client = Minecraft.getInstance();
+        if (client.gameMode == null || client.player == null) return false;
+        return player == client.player && player.containerMenu == player.inventoryMenu;
     }
     
     public static void manualAutoSwap(Player player) {

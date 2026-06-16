@@ -34,8 +34,6 @@ public class DuraPing {
     public static void init() {
         Constants.LOG.info("Initializing DuraPing");
         ConfigManager.load();
-        // Sound events are registered automatically by NeoForge
-        // ModSounds.register();
     }
 
     /**
