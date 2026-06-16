@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "duraping",
+  "version": "${version}",
+  "name": "DuraPing",
+  "description": "Lightweight durability alerts with sound/chat/toast/flash. Client-only QoL.",
+  "authors": ["RedLynx Labs", "redkey"],
+  "contact": {
+    "homepage": "https://redlynx.io",
+    "sources": "https://github.com/redlynxlabs/duraping"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "sh.redkey.mc.duraping.DuraPingFabric"
+    ],
+    "modmenu": [
+      "sh.redkey.mc.duraping.config.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${fabric_minecraft_version_range}"
+  },
+  "mixins": [
+    "duraping.fabric.mixins.json"
+  ]
+}

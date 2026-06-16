@@ -1,178 +1,53 @@
 # DuraPing Release Process
 
-## Overview
+DuraPing uses static semantic versioning and [Stonecutter](https://stonecutter.kikugie.dev)
+for multi-version builds. The release version is the `version=` value in
+`gradle.properties`, and a release is cut by pushing a matching `vX.Y.Z` tag. One
+tag builds every supported Minecraft version for both Fabric and NeoForge and
+publishes them to GitHub, Modrinth, and CurseForge.
 
-DuraPing uses **Axion Release** for dynamic versioning based on git tags. The version is automatically determined from the most recent git tag, eliminating the need for manual version updates in build files.
+## Supported versions
 
-## Branch Structure
+Declared in the Stonecutter `create` block in `settings.gradle.kts`: Minecraft
+1.21.9, 1.21.10, and 1.21.11, each for Fabric and NeoForge (six jars). Per-version
+dependency coordinates live in `gradle.properties`, keyed by Minecraft version
+(for example `fabric_api_1.21.11`).
 
-- **`main`** - Minecraft 1.21.10 (latest)
-- **`stable/1.21.9`** - Minecraft 1.21.9 (stable)
-- **`dev/1.21.10`** - Development for MC 1.21.10
-- **`dev/1.21.9`** - Development for MC 1.21.9
+## Building locally
 
-## Version Format
+- `./gradlew chiseledBuild` builds all six jars, into `versions/<version>-<loader>/build/libs/`.
+- `./gradlew :1.21.10-fabric:build` builds a single node.
+- `./gradlew "Reset active project"` normalizes the working tree to the canonical
+  version (1.21.10-fabric). Run this before committing so the versioned `//?`
+  comments are in a consistent state.
 
-Tags follow this format: `v{VERSION}-{TYPE}-{MC_VERSION}`
+## Cutting a release
 
-Examples:
-- `v0.5.3-stable-1.21.10`
-- `v0.5.3-stable-1.21.9`
-- `v0.5.4-beta-1.21.10`
-- `v0.6.0-rc-1.21.10`
+1. Bump `version=` in `gradle.properties` ([Semantic Versioning](https://semver.org)).
+2. Add a `## [X.Y.Z] - YYYY-MM-DD` section to `CHANGELOG.md` (the workflow extracts it for the notes).
+3. Run `./gradlew "Reset active project"`, commit, and push to `main`.
+4. Tag and push (the tag must equal the version exactly):
 
-## Release Process
+   ```bash
+   git tag -a v0.6.1 -m "Release 0.6.1"
+   git push origin v0.6.1
+   ```
 
-### Quick Release (Single Version)
+The `Release` workflow validates the tag against `gradle.properties`, runs
+`chiseledBuild`, creates the GitHub release with all six jars, and runs
+`chiseledPublish` to Modrinth and CurseForge.
 
-For a single Minecraft version:
+## Dry run
 
-```bash
-# For MC 1.21.10 (main branch)
-./scripts/release.sh 0.5.3 stable 1.21.10
+Run the `Release` workflow manually (`workflow_dispatch`) with **dry run** enabled
+to build and stage the jars without creating a release or publishing.
 
-# For MC 1.21.9 (stable/1.21.9 branch)
-./scripts/release.sh 0.5.3 stable 1.21.9
-```
+## Notes
 
-### Dual Release (Both Versions)
-
-To release for both Minecraft versions simultaneously:
-
-```bash
-./scripts/dual-release.sh 0.5.3 stable
-```
-
-This will:
-1. Create tag `v0.5.3-stable-1.21.9` on `stable/1.21.9` branch
-2. Create tag `v0.5.3-stable-1.21.10` on `main` branch
-3. Push both tags to trigger GitHub Actions
-
-### Manual Release
-
-You can also create tags manually:
-
-```bash
-# Switch to the appropriate branch
-git checkout main  # or stable/1.21.9
-
-# Create the tag
-git tag v0.5.3-stable-1.21.10 -m "Release 0.5.3-stable-1.21.10"
-
-# Push the tag
-git push origin v0.5.3-stable-1.21.10
-```
-
-## How It Works
-
-### 1. Axion Release (Dynamic Versioning)
-
-The `build.gradle` uses axion to determine the version from git tags:
-
-```groovy
-scmVersion {
-    tag {
-        prefix = "v"
-    }
-    useHighestVersion = true
-    ignoreUncommittedChanges = true
-}
-
-version = scmVersion.version
-```
-
-**No manual version updates needed!** Axion reads the version from the git tag automatically.
-
-### 2. GitHub Actions Workflow
-
-When a tag matching `v*-stable-*`, `v*-beta-*`, or `v*-rc-*` is pushed:
-
-1. **Detect Release Info** - Extracts version, Minecraft version, and release type from tag
-2. **Build Artifacts** - Builds both Fabric and NeoForge JARs in parallel
-3. **Create Release** - Creates a single GitHub release with both JARs attached
-4. **Notify Completion** - Outputs release information
-
-### 3. Tag Format Parsing
-
-The workflow automatically parses tags:
-
-- `v0.5.3-stable-1.21.10` → version: `0.5.3-stable-1.21.10`, MC: `1.21.10`, type: `stable`
-- `v0.5.3-stable-1.21.9` → version: `0.5.3-stable-1.21.9`, MC: `1.21.9`, type: `stable`
-- `v0.6.0-beta-1.21.10` → version: `0.6.0-beta-1.21.10`, MC: `1.21.10`, type: `beta`
-
-## Release Checklist
-
-- [ ] Ensure all changes are committed and pushed
-- [ ] Verify CI builds pass on target branch
-- [ ] Choose version number following semantic versioning
-- [ ] Run release script for desired MC version(s)
-- [ ] Verify GitHub Actions workflow completes successfully
-- [ ] Check that release appears in GitHub Releases with both JARs
-
-## Troubleshooting
-
-### GPG Signing Issues
-
-If you encounter GPG signing errors with tags:
-
-```bash
-# Temporarily disable GPG signing
-git config --local tag.gpgSign false
-
-# Create tag without signature
-git tag v0.5.3-stable-1.21.10 -m "Release message"
-
-# Push tag
-git push origin v0.5.3-stable-1.21.10
-```
-
-### Version Not Detected
-
-If axion isn't detecting the version:
-
-```bash
-# Check current version axion will use
-./gradlew currentVersion
-
-# List recent tags
-git tag --list | sort -V | tail -5
-
-# Ensure you're on the right branch
-git branch --show-current
-```
-
-### Build Failures
-
-If GitHub Actions build fails:
-
-1. Check the Actions tab for detailed logs
-2. Verify `gradle.properties` has correct Minecraft version for the branch
-3. Ensure dependencies are available and versions are correct
-4. Test build locally: `./gradlew :fabric:build :neoforge:build`
-
-## Best Practices
-
-1. **Always tag from the correct branch**
-   - Use `main` for 1.21.10 releases
-   - Use `stable/1.21.9` for 1.21.9 releases
-
-2. **Keep version numbers in sync** across MC versions
-   - `v0.5.3-stable-1.21.10` and `v0.5.3-stable-1.21.9` should have the same base version
-
-3. **Test before releasing**
-   - Run local builds to verify everything works
-   - Check lint errors: `./gradlew check`
-
-4. **Use semantic versioning**
-   - `MAJOR.MINOR.PATCH` format
-   - Increment PATCH for bug fixes
-   - Increment MINOR for new features
-   - Increment MAJOR for breaking changes
-
-5. **Write meaningful release notes**
-   - The workflow generates basic notes automatically
-   - Edit the GitHub release after creation to add changelog details
-
-## Advanced: Multi-Platform Publishing
-
-For publishing to CurseForge/Modrinth, additional configuration is needed in the mod-specific build files. This is handled separately from the GitHub release process.
+- Idempotent: the workflow skips if the tag's release already has its six jars.
+- Publishing needs the `MODRINTH_TOKEN` and `CURSEFORGE_API_KEY` repository
+  secrets; without them the publish runs as a dry run.
+- Adding a Minecraft version: add `mc("X.Y.Z")` in `settings.gradle.kts`, fill its
+  coordinates in `gradle.properties`, run `./gradlew "Refresh active project"`, and
+  add any `//?` blocks or `replacements` for API differences. 26.x will be a
+  separate, larger bracket (unobfuscated, Java 25).
