@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build & Test (Java 21)
+    name: Build all versions (Java 21)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,24 +30,14 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build & test
-        run: ./gradlew build --stacktrace
+      - name: Build every version and loader
+        run: ./gradlew chiseledBuild --stacktrace
 
       - name: Upload jars (snapshot)
         uses: actions/upload-artifact@v7
         with:
           name: duraping-snapshot-${{ github.sha }}
           path: |
-            fabric/build/libs/duraping-fabric-*.jar
-            neoforge/build/libs/duraping-neoforge-*.jar
-            !**/*-sources.jar
-            !**/*-javadoc.jar
+            versions/*/build/libs/duraping-*.jar
+            !versions/*/build/libs/*-sources.jar
           if-no-files-found: error
-
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-reports
-          path: "**/build/reports/tests/**"
-          if-no-files-found: ignore

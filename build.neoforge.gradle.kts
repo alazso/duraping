@@ -16,7 +16,7 @@ stonecutter {
 
 version = "${property("version")}+$mcVersion"
 group = property("mod_group")!!
-base { archivesName = "${property("mod_id")}-neoforge-$mcVersion" }
+base { archivesName = "${property("mod_id")}-neoforge" }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of((property("java_version") as String).toInt())
@@ -62,5 +62,27 @@ tasks.processResources {
     inputs.properties(resourceProps)
     filesMatching("META-INF/neoforge.mods.toml") {
         expand(resourceProps)
+    }
+}
+
+publishMods {
+    file = tasks.named<org.gradle.api.tasks.bundling.AbstractArchiveTask>("jar").flatMap { it.archiveFile }
+    type = me.modmuss50.mpp.ReleaseType.STABLE
+    modLoaders.add("neoforge")
+    displayName = "DuraPing ${property("version")} (NeoForge $mcVersion)"
+    version = project.version.toString()
+    changelog = providers.environmentVariable("RELEASE_CHANGELOG")
+        .orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = property("modrinth_id").toString()
+        minecraftVersions.add(mcVersion)
+    }
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = property("curseforge_id").toString()
+        minecraftVersions.add(mcVersion)
     }
 }

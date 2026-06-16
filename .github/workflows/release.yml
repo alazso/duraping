@@ -62,7 +62,8 @@ jobs:
             exit 0
           fi
           ASSET_COUNT="$(gh release view "$TAG" --json assets -q '.assets | length')"
-          if [ "$ASSET_COUNT" -ge 2 ]; then
+          # Six jars (three versions x two loaders).
+          if [ "$ASSET_COUNT" -ge 6 ]; then
             echo "Release $TAG already published; skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
@@ -80,19 +81,17 @@ jobs:
         if: steps.published.outputs.skip != 'true'
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build
+      - name: Build every version and loader
         if: steps.published.outputs.skip != 'true'
-        run: ./gradlew build --stacktrace
+        run: ./gradlew chiseledBuild --stacktrace
 
       - name: Stage release artifacts
         if: steps.published.outputs.skip != 'true'
         run: |
           set -euo pipefail
-          VERSION="${{ steps.version.outputs.version }}"
           STAGING="release-artifacts"
           mkdir -p "$STAGING"
-          cp "fabric/build/libs/duraping-fabric-${VERSION}.jar" "$STAGING/"
-          cp "neoforge/build/libs/duraping-neoforge-${VERSION}.jar" "$STAGING/"
+          find versions -path '*/build/libs/*.jar' ! -name '*-sources.jar' -exec cp {} "$STAGING/" \;
           ls -lh "$STAGING"
 
       - name: Extract changelog notes
@@ -100,13 +99,11 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
-          # Pull this version's section out of CHANGELOG.md for the release notes.
           awk -v v="$VERSION" '
             $0 ~ "^## \\[" v "\\]" {f=1; next}
             /^## \[/ {f=0}
             f
           ' CHANGELOG.md > release-notes.md || true
-          # Expose the notes to the publish step (multi-line env var).
           {
             echo "RELEASE_CHANGELOG<<__EOF__"
             cat release-notes.md
@@ -144,4 +141,4 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-        run: ./gradlew :fabric:publishMods :neoforge:publishMods --stacktrace
+        run: ./gradlew chiseledPublish --stacktrace

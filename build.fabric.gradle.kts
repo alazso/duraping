@@ -16,7 +16,7 @@ stonecutter {
 
 version = "${property("version")}+$mcVersion"
 group = property("mod_group")!!
-base { archivesName = "${property("mod_id")}-fabric-$mcVersion" }
+base { archivesName = "${property("mod_id")}-fabric" }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of((property("java_version") as String).toInt())
@@ -66,5 +66,34 @@ tasks.processResources {
     inputs.properties(resourceProps)
     filesMatching("fabric.mod.json") {
         expand(resourceProps)
+    }
+}
+
+publishMods {
+    file = tasks.named<org.gradle.api.tasks.bundling.AbstractArchiveTask>("remapJar").flatMap { it.archiveFile }
+    type = me.modmuss50.mpp.ReleaseType.STABLE
+    modLoaders.add("fabric")
+    displayName = "DuraPing ${property("version")} (Fabric $mcVersion)"
+    version = project.version.toString()
+    changelog = providers.environmentVariable("RELEASE_CHANGELOG")
+        .orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
+    // Publishes for real only when tokens are present (CI); a local run is a dry run.
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = property("modrinth_id").toString()
+        minecraftVersions.add(mcVersion)
+        requires("fabric-api")
+        requires("cloth-config")
+        optional("modmenu")
+    }
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = property("curseforge_id").toString()
+        minecraftVersions.add(mcVersion)
+        requires { slug = "fabric-api" }
+        requires { slug = "cloth-config" }
+        optional { slug = "modmenu" }
     }
 }
