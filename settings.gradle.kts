@@ -23,9 +23,9 @@ stonecutter {
             version("$version-fabric", version).buildscript = "build.fabric.gradle.kts"
             version("$version-neoforge", version).buildscript = "build.neoforge.gradle.kts"
         }
-        mc("1.21.9")
+        // 1.21.10 is wired first to validate the toolchain; 1.21.9 and 1.21.11
+        // are added once their dependency coordinates are filled in gradle.properties.
         mc("1.21.10")
-        mc("1.21.11")
 
         vcsVersion = "1.21.10-fabric"
     }
