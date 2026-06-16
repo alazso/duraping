@@ -250,8 +250,9 @@ public class DuraPing {
             default -> 0L;
         };
 
-        // Activity-aware suppression for warn/danger (not for critical)
-        if (cfg.activityAware && breakingTicks >= cfg.workTicksThreshold && (bucket == 1 || bucket == 2)) {
+        // Activity-aware suppression applies only to the gentle warn tier. Danger and
+        // critical keep alerting while mining, since durability is actively dropping.
+        if (cfg.activityAware && breakingTicks >= cfg.workTicksThreshold && bucket == 1) {
             bucketCooldown = Math.max(bucketCooldown, cfg.workCooldownSec * 1000L);
         }
 
@@ -262,6 +263,9 @@ public class DuraPing {
         boolean shouldAlert = (crossedDown && st.armed) || (sameBucket && st.armed && cooldownOk && bucket > 1);
         // Critical bucket override: always repeat on cooldown even if disarmed (safety critical)
         if (sameBucket && bucket == 3 && cooldownOk) shouldAlert = true;
+        // While actively mining, the danger tier also repeats on cooldown even if disarmed,
+        // so a continuous dig cannot burn through the danger zone to a broken tool in silence.
+        if (sameBucket && bucket == 2 && cooldownOk && breakingTicks >= cfg.workTicksThreshold) shouldAlert = true;
         // For warn bucket repeats, make it very conservative:
         if (sameBucket && bucket == 1) shouldAlert = st.armed && cooldownOk && breakingTicks < cfg.workTicksThreshold;
 

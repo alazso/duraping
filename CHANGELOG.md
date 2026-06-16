@@ -27,6 +27,9 @@ All notable changes to DuraPing are documented here. This project follows
   editing the client inventory directly, so swaps (tools and armor) hold on real
   servers instead of reverting. It also no longer acts while another container,
   such as a chest, is open.
+- Activity-aware mode no longer silences danger and critical alerts during
+  continuous mining; it quiets only the warn tier, and the danger tier now repeats
+  while mining so a tool cannot wear down to breaking unannounced.
 
 ### Removed
 - Per-version release branches and the `v...-stable-1.21.x` tag scheme, replaced

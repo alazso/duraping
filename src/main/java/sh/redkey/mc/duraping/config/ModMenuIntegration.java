@@ -63,7 +63,7 @@ public class ModMenuIntegration implements ModMenuApi {
             // Activity-Aware Category
             var activity = builder.getOrCreateCategory(Component.literal("Activity-Aware"));
             activity.addEntry(entry.startBooleanToggle(Component.literal("Activity-Aware Mode"), cfg.activityAware)
-                    .setTooltip(Component.literal("Suppress alerts during continuous mining to reduce spam"))
+                    .setTooltip(Component.literal("Quiet warn-tier alerts during continuous mining. Danger and critical still alert so you do not break gear mid-dig."))
                     .setSaveConsumer(v -> cfg.activityAware = v).build());
             activity.addEntry(entry.startIntField(Component.literal("Work Ticks Threshold"), cfg.workTicksThreshold)
                     .setTooltip(Component.literal("How many ticks of continuous mining before suppression kicks in (20 = 1s)"))
