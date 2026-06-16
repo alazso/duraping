@@ -1,178 +1,137 @@
+<div align="center">
+
 # DuraPing
 
-[![Latest Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?branch=main&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
-[![Latest Release](https://img.shields.io/github/v/release/redlynxlabs/duraping?logo=github&style=for-the-badge&label=Latest)](https://github.com/redlynxlabs/duraping/releases/latest)
-[![Previous Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/release.yml?branch=stable/1.21.9&logo=github&style=for-the-badge&label=Build)](https://github.com/redlynxlabs/duraping/actions/workflows/release.yml)
-[![License](https://img.shields.io/github/license/redlynxlabs/duraping?logo=github&style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
-[![Discord](https://img.shields.io/discord/1402745018682179624?label=discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/hologram)
+**Never break your favorite gear again.** Timely durability alerts through chat, sound, screen flash, or hotbar toast, the moment a tool, weapon, or armor piece runs low.
 
-**Lightweight durability alerts for Minecraft 1.21.9 (Fabric)**
+[![Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&style=for-the-badge&label=build)](https://github.com/redlynxlabs/duraping/actions)
+[![Downloads](https://img.shields.io/modrinth/dt/duraping?style=for-the-badge&logo=modrinth&label=downloads&color=00AF5C)](https://modrinth.com/mod/duraping)
+[![Minecraft](https://img.shields.io/badge/Fabric%20·%20NeoForge-1.21.9%2B-2b2d31?style=for-the-badge)](https://fabricmc.net/)
+[![License](https://img.shields.io/badge/license-MIT-2b2d31?style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
 
-DuraPing is a client-side quality-of-life mod that helps you never break your favorite tools, armor, or elytra again. Get timely alerts through chat, sound, screen flash, or toast (hotbar) notifications when your gear is running low on durability.
+[![Modrinth](https://img.shields.io/badge/Modrinth-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/mod/duraping)
+[![CurseForge](https://img.shields.io/badge/CurseForge-F16436?style=for-the-badge&logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/duraping)
+[![Source](https://img.shields.io/badge/Source-0f0f0f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/redlynxlabs/duraping)
+[![Discord](https://img.shields.io/discord/1402745018682179624?style=for-the-badge&logo=discord&logoColor=white&label=discord&color=5865F2)](https://discord.gg/hologram)
 
-## Features
+</div>
 
-### Core Alerts
-- **Multi-tier threshold system**: Warn (25%), Danger (10%), Critical (5%), and 1-durability emergency alerts
-- **Chat notifications**: Discrete in-game messages with item name and remaining uses
-- **Custom sounds**: Subtle audio cues (warning and critical) with subtitle support
-- **Screen flash**: Brief, low-opacity vignette overlay for visual alerts
-- **Toast notifications**: Optional advancement-style pop-ups
+<br>
 
-### Smart Monitoring
-- **All equipment slots**: Main hand, offhand, and all armor pieces
-- **Spam prevention**: Debounced alerts with configurable cooldowns (default: 10s)
-- **One-shot threshold crossing**: Alerts trigger only when durability crosses a threshold downward
-- **Per-item overrides**: Customize thresholds for specific items (e.g., elytra at 15%)
+DuraPing is a **client-side quality-of-life mod** that watches the durability of everything you have equipped and warns you before it breaks. Pick how you want to be told (chat, sound, a screen flash, or a hotbar toast), set the thresholds that matter to you, and stop losing enchanted gear to one swing too many. It runs on **Fabric and NeoForge**, needs nothing on the server, and stays out of your way until your gear is actually in danger.
 
-### Quality of Life
-- **Elytra flight guard**: Extra warning when attempting to fly with critically low elytra
-- **Keybinds**: Toggle alerts, snooze for 5 minutes, or check current item durability on demand
-- **Mod Menu integration**: Clean Cloth Config GUI for all settings
-- **Client-only**: No server-side mod required; works on vanilla servers
+<br>
 
-## Installation
+## At a glance
 
-### Requirements
-- **Minecraft**: 1.21.9
-- **Fabric Loader**: 0.17.3 or higher
-- **Fabric API**: 0.134.0+1.21.9 or higher
-- **Java**: 21 or higher
+|   |   |
+|---|---|
+| 🔔 **Multi-tier alerts** | Warn, Danger, and Critical thresholds, plus an emergency alert at **2 durability** that bypasses snooze. |
+| 📺 **Four alert channels** | Chat, custom sound, screen flash, and hotbar toast. Each one toggles independently. |
+| 🎒 **Every slot watched** | Main hand, offhand, and all four armor pieces, every tick. |
+| 🤫 **Smart anti-spam** | Per-tier cooldowns, hysteresis re-arming, and activity-aware quieting while you mine. |
+| 🎚️ **Per-item thresholds** | Override warn, danger, and critical percentages for specific items by id. |
+| ⏱️ **Snooze and toggle** | Keybinds to silence alerts for a few minutes or switch the mod off entirely. |
+| 🧩 **In-game config** | A clean Mod Menu + Cloth Config screen on Fabric; a plain JSON file on both loaders. |
+| 🌍 **Client-side only** | Works on vanilla servers, modded servers, and singleplayer. No server install. |
 
-### Optional Dependencies
-- **Mod Menu**: For in-game config screen
-- **Cloth Config**: For config UI (auto-installed)
+<br>
 
-### Steps
-1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.21.9
-2. Download [Fabric API](https://modrinth.com/mod/fabric-api)
-3. Download DuraPing from [Releases](https://github.com/redlynxlabs/duraping/releases)
-4. Place all JARs in `.minecraft/mods/`
-5. Launch Minecraft with the Fabric profile
+## Every feature
+
+**Alerts**
+- **Multi-tier thresholds**: Warn (25%), Danger (10%), and Critical (5%) by default, each with its own color and cooldown.
+- **Emergency alert at 2 durability**: ignores snooze, flashes the screen, repeats the critical sound, and prints a banner so you cannot miss it.
+- **Chat messages** with the item name and exact uses remaining.
+- **Custom sounds** for warn and critical, with subtitle support.
+- **Screen flash**: a brief, low-opacity vignette for a glance-free heads-up.
+- **Hotbar toast** messages for a quieter, text-only nudge.
+
+**Smart monitoring**
+- Watches the **main hand, offhand, and all armor** continuously.
+- Fires **once on a downward threshold crossing**, then re-arms only after you recover, with configurable **hysteresis** for Mending or modded durability regen.
+- **Activity-aware mode** stretches warn and danger cooldowns while you are continuously mining, so a long dig does not spam you.
+- Optional **quiet-below-warn**: visual-only alerts in the warn tier, no sound or chat.
+
+**Customization**
+- **Per-item overrides**: different thresholds for an elytra, a netherite pickaxe, or anything else, keyed by item id.
+- Tunable thresholds, per-tier cooldowns, and snooze duration.
+- **In-game config screen on Fabric** via Mod Menu and Cloth Config. On NeoForge, edit the config file directly.
+
+**Controls**
+- Keybinds to **toggle**, **snooze or cancel**, and **show main-hand durability** on demand (defaults on the numpad, fully rebindable).
+
+**Experimental**
+- **Auto-swap** (off by default): swaps a worn-down tool or armor piece for a more durable copy from your inventory, through server-synced inventory actions so it holds up on real servers. It stays opt-in while it gets more in-game testing.
+
+<br>
 
 ## Configuration
 
-### In-Game (Mod Menu)
-Press `Escape` → `Mods` → find "DuraPing" → `Config` button
+The config lives at `config/duraping.json` and is created on first launch.
 
-Configure:
-- Enable/disable individual alert types
-- Set global thresholds (warn/danger/critical %)
-- Adjust cooldown timings
-- Toggle elytra guard
-
-### File-Based (`config/duraping.json`)
 ```json
 {
   "enabled": true,
   "chat": true,
   "sound": true,
-  "flash": true,
+  "flash": false,
   "toast": false,
-  "elytraGuard": true,
   "warn": 25,
   "danger": 10,
   "critical": 5,
-  "cooldownMs": 10000,
+  "warnCooldownSec": 30,
+  "dangerCooldownSec": 15,
+  "criticalCooldownSec": 7,
   "overrides": {
     "minecraft:elytra": { "warn": 15, "danger": 7, "critical": 1 }
   }
 }
 ```
 
-### Per-Item Overrides
-Add entries to `overrides` using the namespaced item ID:
-```json
-"overrides": {
-  "minecraft:elytra": { "warn": 15, "danger": 7, "critical": 1 },
-  "minecraft:netherite_pickaxe": { "warn": 30, "danger": 15, "critical": 10 }
-}
-```
+On Fabric you can edit everything live from **Escape, Mods, DuraPing, Config** (requires Mod Menu and Cloth Config). Per-item overrides use the namespaced item id, for example `minecraft:netherite_pickaxe`.
 
-## Default Keybinds
+<br>
+
+## Keybinds
 
 | Key | Action |
 |-----|--------|
-| **Numpad 7** | Toggle DuraPing on/off |
-| **Numpad 8** | Snooze alerts for 5 minutes |
-| **Numpad 9** | Show main hand durability |
+| **Numpad 7** | Toggle DuraPing on or off |
+| **Numpad 8** | Snooze for 5 minutes, or cancel an active snooze |
+| **Numpad 9** | Show current main-hand durability |
+| **Numpad 0** | Manual auto-swap trigger (experimental) |
 
-*Rebind in `Options` → `Controls` → `DuraPing`*
+Rebind any of these under **Options, Controls, DuraPing**.
 
-## Multiplayer & Server Compatibility
+<br>
 
-**Fully client-side** — Works on:
-- Vanilla servers
-- Modded servers (without DuraPing installed)
-- Singleplayer
+## Requirements
 
-No server-side installation or permissions required.
+|   |   |
+|---|---|
+| **Loader** | Fabric or NeoForge |
+| **Minecraft** | 1.21.9, 1.21.10, or 1.21.11 |
+| **Java** | 21 |
 
-## Development
+**Optional (Fabric):** Mod Menu and Cloth Config for the in-game settings screen. Everything works without them through the config file.
 
-### Building from Source
-```bash
-git clone https://github.com/redlynxlabs/duraping.git
-cd duraping
-./gradlew build
-# Output: build/libs/duraping-v<version>-1.21.9.jar
-```
+<br>
 
-### Branching Strategy
-- `main`: Stable releases only
-- `dev`: Active development branch
-- Open PRs from feature branches to `dev`
-- Merge `dev` → `main` for releases
+## Multiplayer
 
-### Versioning & Releases
-We use [Axion Release](https://github.com/allegro/axion-release-plugin) to read version from Git tags and follow semantic versioning with Conventional Commits.
+DuraPing is **fully client-side**. It reads only your own inventory and never talks to the server, so it works on vanilla servers, modded servers that do not have it, and in singleplayer, with no permissions or server-side install required.
 
-**Creating a release:**
-```bash
-# 1. Merge dev to main
-git checkout main
-git merge dev
-git push origin main
+<br>
 
-# 2. Create signed version tag
-git tag -s -a v0.2.0 -m "Release 0.2.0"  # Minor version
-git tag -s -a v0.1.1 -m "Release 0.1.1"  # Patch version
-git tag -s -a v1.0.0 -m "Release 1.0.0"  # Major version
+## Found a bug? Have an idea?
 
-# 3. Push the signed tag to trigger release workflow
-git push origin v0.2.0
-```
+Bug reports and feature ideas are welcome. Open a [GitHub issue](https://github.com/redlynxlabs/duraping/issues) with your loader and Minecraft version, your DuraPing version, and any relevant console output. For quick questions or to help test, join the [Discord](https://discord.gg/hologram).
 
-### Commit Convention
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-```
-feat: add elytra flight guard
-fix: prevent duplicate alerts on threshold edge
-chore: update Fabric API to 0.111.0
-docs: clarify per-item override syntax
-```
+<br>
 
-## Roadmap / Future Features
+<div align="center">
 
-- [ ] **Effective uses left**: Display Unbreaking-adjusted durability estimates
-- [ ] **Sound pack support**: Let users provide custom alert sounds
-- [ ] **Per-slot thresholds**: Different thresholds for armor vs. tools
-- [ ] **Durability HUD**: Optional on-screen durability overlay
+Released under the [MIT License](https://github.com/redlynxlabs/duraping/blob/main/LICENSE).
 
-## Contributing
-
-Contributions welcome! Please:
-1. Fork and create a feature branch from `dev`
-2. Follow Conventional Commits
-3. Add/update tests as needed
-4. Open PR to `dev` (not `main`)
-
-## License
-
-[GNU GPLv3](LICENSE) — Free to use, modify, and distribute.
-
-## Credits
-
-- **Organization**: [RedLynx Labs](https://redlynx.io) • [GitHub](https://github.com/redlynxlabs)
-- **Author**: [redkey](https://github.com/redkeysh)
-- Built with [Fabric](https://fabricmc.net/), [Cloth Config](https://github.com/shedaniel/cloth-config), and [Mod Menu](https://github.com/TerraformersMC/ModMenu)
+</div>

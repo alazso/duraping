@@ -1,241 +1,147 @@
-name: Multi-Branch Release Pipeline
+name: Release
 
 on:
   push:
     tags:
-      - 'v*-stable-*'
-      - 'v*-beta-*'
-      - 'v*-rc-*'
+      - "v*"
   workflow_dispatch:
     inputs:
-      version_type:
-        description: 'Release type'
-        required: true
-        default: 'stable'
-        type: choice
-        options:
-          - stable
-          - beta
-          - rc
-      minecraft_version:
-        description: 'Minecraft version'
-        required: true
-        default: '1.21.10'
-        type: choice
-        options:
-          - '1.21.9'
-          - '1.21.10'
-      custom_version:
-        description: 'Custom version (optional)'
-        required: false
-        type: string
-
-env:
-  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+UseCompressedOops"
+      dry_run:
+        description: Build artifacts only; do not publish a release
+        type: boolean
+        default: false
 
 permissions:
   contents: write
-  packages: write
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  detect-release-info:
+  release:
+    name: Build & Publish
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.detect.outputs.version }}
-      minecraft_version: ${{ steps.detect.outputs.minecraft_version }}
-      release_type: ${{ steps.detect.outputs.release_type }}
-      is_prerelease: ${{ steps.detect.outputs.is_prerelease }}
-      branch: ${{ steps.detect.outputs.branch }}
     steps:
-      - name: Detect Release Information
-        id: detect
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            # Manual dispatch
-            VERSION="${{ inputs.custom_version }}"
-            if [ -z "$VERSION" ]; then
-              VERSION="0.5.0-${{ inputs.version_type }}-${{ inputs.minecraft_version }}"
-            fi
-            MC_VERSION="${{ inputs.minecraft_version }}"
-            RELEASE_TYPE="${{ inputs.version_type }}"
-            BRANCH="main"
-            if [ "$MC_VERSION" = "1.21.9" ]; then
-              BRANCH="stable/1.21.9"
-            fi
-          else
-            # Tag push
-            TAG_NAME="${{ github.ref_name }}"
-            VERSION="${TAG_NAME#v}"
-            
-            # Extract Minecraft version from tag
-            if [[ "$TAG_NAME" =~ -1\.21\.9$ ]]; then
-              MC_VERSION="1.21.9"
-              BRANCH="stable/1.21.9"
-            else
-              MC_VERSION="1.21.10"
-              BRANCH="main"
-            fi
-            
-            # Extract release type
-            if [[ "$TAG_NAME" =~ -stable- ]]; then
-              RELEASE_TYPE="stable"
-            elif [[ "$TAG_NAME" =~ -beta- ]]; then
-              RELEASE_TYPE="beta"
-            elif [[ "$TAG_NAME" =~ -rc- ]]; then
-              RELEASE_TYPE="rc"
-            else
-              RELEASE_TYPE="stable"
-            fi
-          fi
-          
-          # Determine if prerelease
-          if [ "$RELEASE_TYPE" = "beta" ] || [ "$RELEASE_TYPE" = "rc" ]; then
-            IS_PRERELEASE="true"
-          else
-            IS_PRERELEASE="false"
-          fi
-          
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "minecraft_version=$MC_VERSION" >> $GITHUB_OUTPUT
-          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-          
-          echo "Release Info:"
-          echo "  Version: $VERSION"
-          echo "  Minecraft: $MC_VERSION"
-          echo "  Type: $RELEASE_TYPE"
-          echo "  Branch: $BRANCH"
-          echo "  Prerelease: $IS_PRERELEASE"
-
-  build-artifacts:
-    needs: detect-release-info
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [fabric, neoforge]
-    outputs:
-      fabric-jar: ${{ steps.artifacts.outputs.fabric-jar }}
-      neoforge-jar: ${{ steps.artifacts.outputs.neoforge-jar }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
         with:
-          ref: ${{ needs.detect-release-info.outputs.branch }}
           fetch-depth: 0
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Cache Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: wrapper
-          cache-read-only: false
-          cache-write-only: false
-
-      - name: Configure Build
+      - name: Resolve version
+        id: version
         run: |
-          # Update Minecraft version in gradle.properties (axion handles version from tag)
-          sed -i "s/minecraft_version=.*/minecraft_version=${{ needs.detect-release-info.outputs.minecraft_version }}/" gradle.properties
-          
-          echo "Building ${{ matrix.platform }} for version ${{ needs.detect-release-info.outputs.version }}"
-
-      - name: Build Project
-        run: ./gradlew :${{ matrix.platform }}:build --no-daemon --parallel --build-cache
-
-      - name: Prepare Artifacts
-        id: artifacts
-        run: |
-          mkdir -p artifacts
-          cp ${{ matrix.platform }}/build/libs/*.jar artifacts/
-          
-          # Rename to standard format if needed
-          for jar in artifacts/*.jar; do
-            if [[ "$jar" =~ duraping-${{ matrix.platform }}-.*\.jar$ ]]; then
-              target="artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar"
-              if [[ "$jar" != "$target" ]]; then
-                mv "$jar" "$target"
-              fi
+          set -euo pipefail
+          GRADLE_VERSION="$(sed -n 's/^version=//p' gradle.properties | tr -d '[:space:]')"
+          if [ -z "$GRADLE_VERSION" ]; then
+            echo "Could not read version from gradle.properties" >&2
+            exit 1
+          fi
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG="${GITHUB_REF_NAME}"
+            TAG_VERSION="${TAG#v}"
+            if [ "$TAG_VERSION" != "$GRADLE_VERSION" ]; then
+              echo "Tag $TAG (${TAG_VERSION}) does not match gradle.properties (${GRADLE_VERSION})" >&2
+              exit 1
             fi
-          done
+          else
+            TAG="v${GRADLE_VERSION}"
+          fi
+          echo "version=${GRADLE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.platform }}-jar
-          path: artifacts/duraping-${{ matrix.platform }}-${{ needs.detect-release-info.outputs.version }}.jar
-          retention-days: 1
-
-  create-release:
-    needs: [detect-release-info, build-artifacts]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.detect-release-info.outputs.branch }}
-          fetch-depth: 0
-
-      - name: Download Fabric Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: fabric-jar
-          path: artifacts/
-
-      - name: Download NeoForge Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: neoforge-jar
-          path: artifacts/
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.detect-release-info.outputs.version }}
-          name: DuraPing ${{ needs.detect-release-info.outputs.version }} (MC ${{ needs.detect-release-info.outputs.minecraft_version }})
-          body: |
-            ## DuraPing ${{ needs.detect-release-info.outputs.version }}
-            
-            **Minecraft Version:** ${{ needs.detect-release-info.outputs.minecraft_version }}
-            **Release Type:** ${{ needs.detect-release-info.outputs.release_type }}
-            
-            ### Downloads
-            - **Fabric:** `duraping-fabric-${{ needs.detect-release-info.outputs.version }}.jar`
-            - **NeoForge:** `duraping-neoforge-${{ needs.detect-release-info.outputs.version }}.jar`
-            
-            ### Installation
-            1. Download the appropriate JAR for your mod loader
-            2. Place in your `mods` folder
-            3. Launch Minecraft and enjoy!
-          draft: false
-          prerelease: ${{ needs.detect-release-info.outputs.is_prerelease }}
-          files: |
-            artifacts/duraping-fabric-${{ needs.detect-release-info.outputs.version }}.jar
-            artifacts/duraping-neoforge-${{ needs.detect-release-info.outputs.version }}.jar
-
-  notify-completion:
-    needs: [detect-release-info, build-artifacts, create-release]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Release Complete
+      - name: Skip if release already fully published
+        id: published
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "Release ${{ needs.detect-release-info.outputs.version }} completed!"
-          echo "Minecraft Version: ${{ needs.detect-release-info.outputs.minecraft_version }}"
-          echo "Release Type: ${{ needs.detect-release-info.outputs.release_type }}"
-          echo "View at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.detect-release-info.outputs.version }}"
+          set -euo pipefail
+          TAG="${{ steps.version.outputs.tag }}"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ASSET_COUNT="$(gh release view "$TAG" --json assets -q '.assets | length')"
+          if [ "$ASSET_COUNT" -ge 2 ]; then
+            echo "Release $TAG already published; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up JDK 21
+        if: steps.published.outputs.skip != 'true'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        if: steps.published.outputs.skip != 'true'
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build
+        if: steps.published.outputs.skip != 'true'
+        run: ./gradlew build --stacktrace
+
+      - name: Stage release artifacts
+        if: steps.published.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          STAGING="release-artifacts"
+          mkdir -p "$STAGING"
+          cp "fabric/build/libs/duraping-fabric-${VERSION}.jar" "$STAGING/"
+          cp "neoforge/build/libs/duraping-neoforge-${VERSION}.jar" "$STAGING/"
+          ls -lh "$STAGING"
+
+      - name: Extract changelog notes
+        if: steps.published.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          # Pull this version's section out of CHANGELOG.md for the release notes.
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" {f=1; next}
+            /^## \[/ {f=0}
+            f
+          ' CHANGELOG.md > release-notes.md || true
+          # Expose the notes to the publish step (multi-line env var).
+          {
+            echo "RELEASE_CHANGELOG<<__EOF__"
+            cat release-notes.md
+            echo "__EOF__"
+          } >> "$GITHUB_ENV"
+
+      - name: Upload artifact bundle
+        if: steps.published.outputs.skip != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ steps.version.outputs.tag }}
+          path: release-artifacts/*
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: steps.published.outputs.skip != 'true' && (github.event_name == 'push' || inputs.dry_run != true)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="${{ steps.version.outputs.tag }}"
+          STAGING="release-artifacts"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$STAGING"/* --clobber
+          elif [ -s release-notes.md ]; then
+            gh release create "$TAG" --title "v${VERSION}" --notes-file release-notes.md "$STAGING"/*
+          else
+            gh release create "$TAG" --title "v${VERSION}" --generate-notes "$STAGING"/*
+          fi
+
+      - name: Publish to Modrinth & CurseForge
+        if: steps.published.outputs.skip != 'true' && (github.event_name == 'push' || inputs.dry_run != true)
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+        run: ./gradlew :fabric:publishMods :neoforge:publishMods --stacktrace

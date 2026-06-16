@@ -1,31 +1,14 @@
 plugins {
     // see https://fabricmc.net/develop/ for new versions
-    id 'fabric-loom' version '1.11-SNAPSHOT' apply false
+    id 'fabric-loom' version '1.14.10' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.115' apply false
-    // Axion release for version management
-    id 'pl.allegro.tech.build.axion-release' version '1.18.15'
     // Mod publishing plugin
     id 'me.modmuss50.mod-publish-plugin' version '0.7.4' apply false
 }
 
-// Configure Axion Release - Dynamic versioning from git tags
-scmVersion {
-    tag {
-        prefix = "v"
-        // Tag format: v0.5.3-stable-1.21.10
-        // Axion will extract version from the most recent tag
-    }
-    // Use the exact tag version without incrementing
-    versionIncrementer 'incrementMinor'
-    // Don't append branch name to version
-    useHighestVersion = true
-    // Allow builds with uncommitted changes (for CI)
-    ignoreUncommittedChanges = true
-}
-
-// Use axion's dynamic version from git tags
-version = scmVersion.version
+// Version is read statically from gradle.properties (version=...). The release
+// workflow validates that the pushed tag matches this value.
 
 allprojects {
     repositories {
@@ -33,5 +16,9 @@ allprojects {
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = 'https://maven.shedaniel.me/' } // Cloth Config + Mod Menu
         maven { url = 'https://maven.terraformersmc.com/releases/' } // Mod Menu
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = Integer.parseInt(findProperty('java_version').toString())
     }
 }

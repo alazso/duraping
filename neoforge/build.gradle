@@ -44,7 +44,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = providers.fileContents(layout.projectDirectory.file("../../CHANGELOG.md")).asText
+    changelog = providers.environmentVariable("RELEASE_CHANGELOG").orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
     type = STABLE
     modLoaders.add("neoforge")
     displayName = "DuraPing v${version}"
@@ -56,7 +56,7 @@ publishMods {
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = property("curseforge_id").toString()
-        minecraftVersions.add(minecraft_version)
+        minecraftVersions.addAll("1.21.9", "1.21.10", "1.21.11")
         
         // Dependencies
         requires {
@@ -74,7 +74,7 @@ publishMods {
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = property("modrinth_id").toString()
-        minecraftVersions.add(minecraft_version)
+        minecraftVersions.addAll("1.21.9", "1.21.10", "1.21.11")
         
         // Dependencies
         requires("neoforge")
