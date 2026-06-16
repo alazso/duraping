@@ -6,6 +6,14 @@ plugins {
 val mcVersion = project.name.substringBeforeLast("-")
 fun dep(key: String): String = property("${key}_$mcVersion") as String
 
+stonecutter {
+    // Minecraft 1.21.11 renamed ResourceLocation -> Identifier (and location() -> identifier()).
+    replacements.string(current.parsed >= "1.21.11") {
+        replace("ResourceLocation", "Identifier")
+        replace("location()", "identifier()")
+    }
+}
+
 version = "${property("version")}+$mcVersion"
 group = property("mod_group")!!
 base { archivesName = "${property("mod_id")}-fabric-$mcVersion" }
@@ -33,7 +41,9 @@ dependencies {
     minecraft("com.mojang:minecraft:$mcVersion")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-$mcVersion:${dep("parchment")}@zip")
+        findProperty("parchment_$mcVersion")?.let {
+            parchment("org.parchmentmc.data:parchment-$mcVersion:$it@zip")
+        }
     })
     modImplementation("net.fabricmc:fabric-loader:${dep("fabric_loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${dep("fabric_api")}")
