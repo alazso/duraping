@@ -61,8 +61,8 @@ DuraPing is a **client-side quality-of-life mod** that watches the durability of
 **Controls**
 - Keybinds to **toggle**, **snooze or cancel**, and **show main-hand durability** on demand (defaults on the numpad, fully rebindable).
 
-**Experimental**
-- **Auto-swap** (off by default): swaps a worn-down tool or armor piece for a more durable copy from your inventory, through server-synced inventory actions so it holds up on real servers. It stays opt-in while it gets more in-game testing.
+**Auto-swap** (off by default)
+- Swaps a worn-down tool or armor piece for a more durable copy from your inventory, through server-synced inventory actions that hold up on real servers.
 
 <br>
 
@@ -100,7 +100,7 @@ On Fabric you can edit everything live from **Escape, Mods, DuraPing, Config** (
 | **Numpad 7** | Toggle DuraPing on or off |
 | **Numpad 8** | Snooze for 5 minutes, or cancel an active snooze |
 | **Numpad 9** | Show current main-hand durability |
-| **Numpad 0** | Manual auto-swap trigger (experimental) |
+| **Numpad 0** | Manual auto-swap trigger |
 
 Rebind any of these under **Options, Controls, DuraPing**.
 
