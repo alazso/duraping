@@ -7,7 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import sh.redkey.mc.duraping.config.DuraPingConfigScreen;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -25,9 +28,12 @@ public class DuraPingNeoForge {
     private static KeyMapping autoSwapMainHandKey;
     private static KeyMapping autoSwapArmorKey;
 
-    public DuraPingNeoForge(IEventBus modBus) {
+    public DuraPingNeoForge(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::clientSetup);
         modBus.addListener(this::registerKeyMappings);
+        // In-game config screen: Mods list -> DuraPing -> Config (shared Cloth screen with Fabric).
+        container.registerExtensionPoint(IConfigScreenFactory.class,
+                (c, parent) -> DuraPingConfigScreen.create(parent));
     }
 
     private void clientSetup(FMLClientSetupEvent event) {

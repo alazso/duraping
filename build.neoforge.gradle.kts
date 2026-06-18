@@ -57,12 +57,18 @@ repositories {
     mavenCentral()
     maven("https://maven.neoforged.net/releases/")
     maven("https://maven.parchmentmc.org/")
+    maven("https://maven.shedaniel.me/")
 }
 
 sourceSets {
     main {
         resources.srcDir(rootProject.file("src/neoforge/resources"))
     }
+}
+
+dependencies {
+    // Cloth Config powers the in-game config screen (DuraPingConfigScreen), shared with Fabric.
+    implementation("me.shedaniel.cloth:cloth-config-neoforge:${dep("cloth")}")
 }
 
 neoForge {
