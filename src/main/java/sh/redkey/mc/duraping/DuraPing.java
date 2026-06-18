@@ -65,9 +65,10 @@ public class DuraPing {
             breakingTicks = 0;
         }
 
-        // Hands
-        checkStack(ItemKey.of(client.player.getMainHandItem()), null);
-        checkStack(ItemKey.of(client.player.getOffhandItem()), null);
+        // Hands: pass distinct slots so two stacks of the same item type (e.g. a pickaxe in each
+        // hand) do not collapse to one shared alert state and thrash each other's re-arm/fire.
+        checkStack(ItemKey.of(client.player.getMainHandItem()), EquipmentSlot.MAINHAND);
+        checkStack(ItemKey.of(client.player.getOffhandItem()), EquipmentSlot.OFFHAND);
 
         // Armor - check durability alerts
         for (EquipmentSlot slot : EquipmentSlot.values()) {
