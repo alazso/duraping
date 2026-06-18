@@ -14,7 +14,7 @@ import sh.redkey.mc.duraping.config.DuraPingConfigScreen;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.lwjgl.glfw.GLFW;
@@ -47,7 +47,7 @@ public class DuraPingNeoForge {
         NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onClientTick);
         NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onLeftClickBlock);
         NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onRightClickBlock);
-        NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onRenderGuiLayer);
+        NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onRenderGui);
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {
@@ -109,7 +109,9 @@ public class DuraPingNeoForge {
         DuraPing.onUseBlock();
     }
 
-    private static void onRenderGuiLayer(RenderGuiLayerEvent.Post event) {
+    private static void onRenderGui(RenderGuiEvent.Post event) {
+        // RenderGuiEvent.Post fires once per frame (RenderGuiLayerEvent fires per layer, which
+        // stacked the translucent flash ~15x into an opaque wash).
         renderFlashOverlay(event.getGuiGraphics());
     }
 
