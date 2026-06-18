@@ -6,7 +6,7 @@ plugins {
     //   net.fabricmc.fabric-loom       -> unobfuscated, no remapping    (build.fabric-m)
     id("net.fabricmc.fabric-loom-remap") version "1.17.11" apply false
     id("net.fabricmc.fabric-loom") version "1.17.11" apply false
-    id("net.neoforged.moddev") version "2.0.115" apply false
+    id("net.neoforged.moddev") version "2.0.141" apply false
     id("me.modmuss50.mod-publish-plugin") version "0.7.4" apply false
 }
 

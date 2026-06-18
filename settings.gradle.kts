@@ -26,8 +26,10 @@ stonecutter {
         // one jar for 1.21.9-1.21.10 (verified), one for 1.21.11.
         version("1.21.9-neoforge", "1.21.9").buildscript = "build.neoforge.gradle.kts"
         version("1.21.11-neoforge", "1.21.11").buildscript = "build.neoforge.gradle.kts"
-        // Minecraft 26.x is unobfuscated: a separate "modern" loom buildscript (no Mojmap, Java 25).
+        // Minecraft 26.x is unobfuscated: Fabric uses the "modern" loom buildscript (no Mojmap, Java 25);
+        // NeoForge (moddev) handles 26.x through the same buildscript as 1.21.x.
         version("26.1.2-fabric", "26.1.2").buildscript = "build.fabric-m.gradle.kts"
+        version("26.1.2-neoforge", "26.1.2").buildscript = "build.neoforge.gradle.kts"
 
         vcsVersion = "1.21.9-fabric"
     }

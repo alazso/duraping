@@ -7,17 +7,40 @@ val mcVersion = project.name.substringBeforeLast("-")
 fun dep(key: String): String = property("${key}_$mcVersion") as String
 
 // NeoForge has no intermediary cushion, so the 1.21.11 ResourceLocation->Identifier rename
-// splits the line: the 1.21.9 build serves 1.21.9-1.21.10, the 1.21.11 build serves 1.21.11+.
-val isLatest = mcVersion == "1.21.11"
-val neoMcRange = if (isLatest) "[1.21.11,1.22)" else "[1.21.9,1.21.11)"
-val neoGameVersions = if (isLatest) listOf("1.21.11") else listOf("1.21.9", "1.21.10")
-val neoLabel = if (isLatest) "1.21.11" else "1.21.9-1.21.10"
+// splits the 1.21.x line (1.21.9-1.21.10 vs 1.21.11). Unobfuscated 26.x is its own jar.
+val is26 = mcVersion.substringBefore(".").toInt() >= 26
+val neoMcRange = when {
+    is26 -> "[26.1.2,27)"
+    mcVersion == "1.21.11" -> "[1.21.11,1.22)"
+    else -> "[1.21.9,1.21.11)"
+}
+val neoGameVersions = when {
+    is26 -> listOf(mcVersion)
+    mcVersion == "1.21.11" -> listOf("1.21.11")
+    else -> listOf("1.21.9", "1.21.10")
+}
+val neoLabel = when {
+    is26 -> mcVersion
+    mcVersion == "1.21.11" -> "1.21.11"
+    else -> "1.21.9-1.21.10"
+}
 
 stonecutter {
     // Minecraft 1.21.11 renamed ResourceLocation -> Identifier (and location() -> identifier()).
     replacements.string(current.parsed >= "1.21.11") {
         replace("ResourceLocation", "Identifier")
         replace("location()", "identifier()")
+    }
+    // Minecraft 26.x renames in the common code (the fabric-only HUD/keybind changes live in
+    // the //? fabric block and never reach NeoForge).
+    replacements.string(current.parsed >= "26.1.2") {
+        replace("ClickType", "ContainerInput")
+        replace("handleInventoryMouseClick", "handleContainerInput")
+        replace("player.displayClientMessage(msg, false)", "player.sendSystemMessage(msg)")
+        replace("player.displayClientMessage(msg, true)", "player.sendOverlayMessage(msg)")
+        // NeoForge HUD entrypoint: GuiGraphics was replaced by GuiGraphicsExtractor.
+        replace("import net.minecraft.client.gui.GuiGraphics;", "import net.minecraft.client.gui.GuiGraphicsExtractor;")
+        replace("renderFlashOverlay(GuiGraphics graphics)", "renderFlashOverlay(GuiGraphicsExtractor graphics)")
     }
 }
 
@@ -26,7 +49,7 @@ group = property("mod_group")!!
 base { archivesName = "${property("mod_id")}-neoforge" }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of((property("java_version") as String).toInt())
+    toolchain.languageVersion = JavaLanguageVersion.of(if (is26) 25 else (property("java_version") as String).toInt())
     withSourcesJar()
 }
 
