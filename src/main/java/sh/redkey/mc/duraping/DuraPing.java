@@ -36,6 +36,17 @@ public class DuraPing {
         ConfigManager.load();
     }
 
+    // Minecraft 26.x removed Player.displayClientMessage(Component, boolean). These two helpers
+    // centralize the call so the modern (26.x) build can rewrite the body to sendSystemMessage /
+    // sendOverlayMessage via a Stonecutter replacement, leaving 1.21.x untouched.
+    public static void sendChat(net.minecraft.world.entity.player.Player player, Component msg) {
+        player.displayClientMessage(msg, false);
+    }
+
+    public static void sendActionBar(net.minecraft.world.entity.player.Player player, Component msg) {
+        player.displayClientMessage(msg, true);
+    }
+
     /**
      * Main client tick handler - should be called every tick by platform implementations
      */
@@ -103,7 +114,7 @@ public class DuraPing {
         var msg = Component.literal("DuraPing: " + (cfg.enabled ? "ENABLED" : "DISABLED"))
                 .withStyle(style -> style.withColor(cfg.enabled ? 0x55FF55 : 0xFF5555).withBold(true));
         MC.gui.setOverlayMessage(msg, false);
-        if (MC.player != null) MC.player.displayClientMessage(msg, false);
+        if (MC.player != null) sendChat(MC.player, msg);
     }
 
     /**
@@ -118,7 +129,7 @@ public class DuraPing {
             var msg = Component.literal("DuraPing: Snooze CANCELLED")
                     .withStyle(style -> style.withColor(0x55FF55).withBold(true));
             MC.gui.setOverlayMessage(msg, false);
-            if (MC.player != null) MC.player.displayClientMessage(msg, false);
+            if (MC.player != null) sendChat(MC.player, msg);
         } else {
             // Not snoozed - activate snooze
             int minutes = Math.max(1, cfg.snoozeDurationMinutes); // Minimum 1 minute
@@ -126,7 +137,7 @@ public class DuraPing {
             var msg = Component.literal("DuraPing: Snoozed for " + minutes + " minute" + (minutes == 1 ? "" : "s"))
                     .withStyle(style -> style.withColor(0xFFAA00).withBold(true));
             MC.gui.setOverlayMessage(msg, false);
-            if (MC.player != null) MC.player.displayClientMessage(msg, false);
+            if (MC.player != null) sendChat(MC.player, msg);
         }
     }
 
@@ -199,7 +210,7 @@ public class DuraPing {
                         .append(Component.literal(key.displayName() + " - " + left + " uses left\n").withStyle(style -> style.withColor(0xFF5555)))
                         .append(Component.literal("---------------------------------------------"));
                 
-                if (cfg.chat && MC.player != null) MC.player.displayClientMessage(emergencyMsg, false);
+                if (cfg.chat && MC.player != null) sendChat(MC.player, emergencyMsg);
                 if (cfg.toast) {
                     toast("⚠ EMERGENCY: " + key.displayName() + " - 2 DURABILITY");
                 }
@@ -300,7 +311,7 @@ public class DuraPing {
                     default -> Component.translatable("text.duraping.warn", key.displayName(), left)
                             .withStyle(style -> style.withColor(0xFFAA00)); // Gold/yellow
                 };
-                MC.player.displayClientMessage(msg, false);
+                sendChat(MC.player, msg);
             }
             if (cfg.sound)  MC.player.playSound(critical ? SoundEvents.CRITICAL : SoundEvents.WARN, 1.0F, 1.0F);
             if (cfg.flash)  flash(critical ? 0.55f : 0.30f);

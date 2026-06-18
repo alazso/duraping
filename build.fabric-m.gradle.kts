@@ -11,6 +11,20 @@ stonecutter {
         replace("ResourceLocation", "Identifier")
         replace("location()", "identifier()")
     }
+    // Minecraft 26.x (unobfuscated) API renames.
+    replacements.string(current.parsed >= "26.1.2") {
+        // Inventory click enum + client-side click method (AutoSwapUtil).
+        replace("ClickType", "ContainerInput")
+        replace("handleInventoryMouseClick", "handleContainerInput")
+        // fabric-api keybinding module: fabric-key-binding-api-v1 -> fabric-key-mapping-api-v1.
+        replace("keybinding.v1.KeyBindingHelper", "keymapping.v1.KeyMappingHelper")
+        replace("KeyBindingHelper.registerKeyBinding", "KeyMappingHelper.registerKeyMapping")
+        // HudRenderCallback removed; the register call itself is gated in DuraPingFabric.
+        replace("import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;", "import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;")
+        // Player.displayClientMessage(Component, boolean) removed (rewrites the two helpers in DuraPing).
+        replace("player.displayClientMessage(msg, false)", "player.sendSystemMessage(msg)")
+        replace("player.displayClientMessage(msg, true)", "player.sendOverlayMessage(msg)")
+    }
 }
 
 version = "${property("version")}+$mcVersion"

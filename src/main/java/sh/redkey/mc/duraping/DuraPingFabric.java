@@ -29,6 +29,16 @@ public class DuraPingFabric implements ClientModInitializer {
         registerKeybinds();
 
         // Register HUD flash overlay
+        //? if >=26.1.2 {
+        /*HudElementRegistry.addLast(net.minecraft.resources.Identifier.fromNamespaceAndPath("duraping", "flash"), (extractor, deltaTracker) -> {
+            float alpha = DuraPing.getFlashAlpha();
+            if (alpha <= 0f) return;
+            int w = extractor.guiWidth();
+            int h = extractor.guiHeight();
+            int a = (int)(alpha * 120) << 24;
+            extractor.fill(0, 0, w, h, 0x00FFFFFF | a);
+        });
+        *///?} else {
         HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
             float alpha = DuraPing.getFlashAlpha();
             if (alpha <= 0f) return;
@@ -40,6 +50,7 @@ public class DuraPingFabric implements ClientModInitializer {
             int a = (int)(alpha * 120) << 24;
             guiGraphics.fill(0, 0, w, h, 0x00FFFFFF | a);
         });
+        //?}
 
         // Register attack/use callbacks for auto-swap
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
