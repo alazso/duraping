@@ -19,14 +19,14 @@ rootProject.name = "DuraPing"
 
 stonecutter {
     create(rootProject) {
-        fun mc(version: String) {
-            version("$version-fabric", version).buildscript = "build.fabric.gradle.kts"
-            version("$version-neoforge", version).buildscript = "build.neoforge.gradle.kts"
-        }
-        mc("1.21.9")
-        mc("1.21.10")
-        mc("1.21.11")
+        // One Fabric jar covers 1.21.9-1.21.11: Fabric's intermediary mappings make the
+        // 1.21.11 ResourceLocation->Identifier rename transparent at runtime (verified in-game).
+        version("1.21.9-fabric", "1.21.9").buildscript = "build.fabric.gradle.kts"
+        // NeoForge runs against Mojmap with no intermediary cushion, so the rename forces a split:
+        // one jar for 1.21.9-1.21.10 (verified), one for 1.21.11.
+        version("1.21.9-neoforge", "1.21.9").buildscript = "build.neoforge.gradle.kts"
+        version("1.21.11-neoforge", "1.21.11").buildscript = "build.neoforge.gradle.kts"
 
-        vcsVersion = "1.21.10-fabric"
+        vcsVersion = "1.21.9-fabric"
     }
 }

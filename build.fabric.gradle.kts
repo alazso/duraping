@@ -14,7 +14,7 @@ stonecutter {
     }
 }
 
-version = "${property("version")}+$mcVersion"
+version = "${property("version")}+1.21.9-1.21.11"
 group = property("mod_group")!!
 base { archivesName = "${property("mod_id")}-fabric" }
 
@@ -60,7 +60,7 @@ loom {
 val resourceProps = mapOf(
     "version" to property("version").toString(),
     "fabric_loader_version" to dep("fabric_loader"),
-    "fabric_minecraft_version_range" to mcVersion,
+    "fabric_minecraft_version_range" to ">=1.21.9 <1.22",
 )
 tasks.processResources {
     inputs.properties(resourceProps)
@@ -73,7 +73,7 @@ publishMods {
     file = tasks.named<org.gradle.api.tasks.bundling.AbstractArchiveTask>("remapJar").flatMap { it.archiveFile }
     type = me.modmuss50.mpp.ReleaseType.STABLE
     modLoaders.add("fabric")
-    displayName = "DuraPing ${property("version")} (Fabric $mcVersion)"
+    displayName = "DuraPing ${property("version")} (Fabric 1.21.9-1.21.11)"
     version = project.version.toString()
     changelog = providers.environmentVariable("RELEASE_CHANGELOG")
         .orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
@@ -83,7 +83,7 @@ publishMods {
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = property("modrinth_id").toString()
-        minecraftVersions.add(mcVersion)
+        minecraftVersions.addAll("1.21.9", "1.21.10", "1.21.11")
         requires("fabric-api")
         requires("cloth-config")
         optional("modmenu")
@@ -91,7 +91,7 @@ publishMods {
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = property("curseforge_id").toString()
-        minecraftVersions.add(mcVersion)
+        minecraftVersions.addAll("1.21.9", "1.21.10", "1.21.11")
         requires { slug = "fabric-api" }
         requires { slug = "cloth-config" }
         optional { slug = "modmenu" }

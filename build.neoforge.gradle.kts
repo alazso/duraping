@@ -6,6 +6,13 @@ plugins {
 val mcVersion = project.name.substringBeforeLast("-")
 fun dep(key: String): String = property("${key}_$mcVersion") as String
 
+// NeoForge has no intermediary cushion, so the 1.21.11 ResourceLocation->Identifier rename
+// splits the line: the 1.21.9 build serves 1.21.9-1.21.10, the 1.21.11 build serves 1.21.11+.
+val isLatest = mcVersion == "1.21.11"
+val neoMcRange = if (isLatest) "[1.21.11,1.22)" else "[1.21.9,1.21.11)"
+val neoGameVersions = if (isLatest) listOf("1.21.11") else listOf("1.21.9", "1.21.10")
+val neoLabel = if (isLatest) "1.21.11" else "1.21.9-1.21.10"
+
 stonecutter {
     // Minecraft 1.21.11 renamed ResourceLocation -> Identifier (and location() -> identifier()).
     replacements.string(current.parsed >= "1.21.11") {
@@ -14,7 +21,7 @@ stonecutter {
     }
 }
 
-version = "${property("version")}+$mcVersion"
+version = "${property("version")}+$neoLabel"
 group = property("mod_group")!!
 base { archivesName = "${property("mod_id")}-neoforge" }
 
@@ -55,7 +62,7 @@ neoForge {
 
 val resourceProps = mapOf(
     "version" to property("version").toString(),
-    "minecraft_version_range" to "[$mcVersion]",
+    "minecraft_version_range" to neoMcRange,
     "neoforge_loader_version_range" to "[4,)",
 )
 tasks.processResources {
@@ -69,7 +76,7 @@ publishMods {
     file = tasks.named<org.gradle.api.tasks.bundling.AbstractArchiveTask>("jar").flatMap { it.archiveFile }
     type = me.modmuss50.mpp.ReleaseType.STABLE
     modLoaders.add("neoforge")
-    displayName = "DuraPing ${property("version")} (NeoForge $mcVersion)"
+    displayName = "DuraPing ${property("version")} (NeoForge $neoLabel)"
     version = project.version.toString()
     changelog = providers.environmentVariable("RELEASE_CHANGELOG")
         .orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
@@ -78,11 +85,11 @@ publishMods {
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = property("modrinth_id").toString()
-        minecraftVersions.add(mcVersion)
+        minecraftVersions.addAll(neoGameVersions)
     }
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = property("curseforge_id").toString()
-        minecraftVersions.add(mcVersion)
+        minecraftVersions.addAll(neoGameVersions)
     }
 }

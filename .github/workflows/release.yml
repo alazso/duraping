@@ -62,8 +62,8 @@ jobs:
             exit 0
           fi
           ASSET_COUNT="$(gh release view "$TAG" --json assets -q '.assets | length')"
-          # Six jars (three versions x two loaders).
-          if [ "$ASSET_COUNT" -ge 6 ]; then
+          # Three jars: one Fabric (1.21.9-1.21.11), two NeoForge (1.21.9-1.21.10 and 1.21.11).
+          if [ "$ASSET_COUNT" -ge 3 ]; then
             echo "Release $TAG already published; skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
