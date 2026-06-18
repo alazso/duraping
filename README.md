@@ -32,7 +32,7 @@ DuraPing is a **client-side quality-of-life mod** that watches the durability of
 | 🤫 **Smart anti-spam** | Per-tier cooldowns, hysteresis re-arming, and activity-aware quieting while you mine. |
 | 🎚️ **Per-item thresholds** | Override warn, danger, and critical percentages for specific items by id. |
 | ⏱️ **Snooze and toggle** | Keybinds to silence alerts for a few minutes or switch the mod off entirely. |
-| 🧩 **In-game config** | A clean Mod Menu + Cloth Config screen on Fabric; a plain JSON file on both loaders. |
+| 🧩 **In-game config** | A Cloth Config screen on both loaders (Fabric via Mod Menu, NeoForge via the Mods list), plus a plain JSON file. |
 | 🌍 **Client-side only** | Works on vanilla servers, modded servers, and singleplayer. No server install. |
 
 <br>
@@ -56,7 +56,7 @@ DuraPing is a **client-side quality-of-life mod** that watches the durability of
 **Customization**
 - **Per-item overrides**: different thresholds for an elytra, a netherite pickaxe, or anything else, keyed by item id.
 - Tunable thresholds, per-tier cooldowns, and snooze duration.
-- **In-game config screen on Fabric** via Mod Menu and Cloth Config. On NeoForge, edit the config file directly.
+- **In-game config screen on both loaders** via Cloth Config: Fabric through Mod Menu, NeoForge through the Mods list (Mods → DuraPing → Config). The JSON config file still works everywhere.
 
 **Controls**
 - Keybinds to **toggle**, **snooze or cancel**, and **show main-hand durability** on demand (defaults on the numpad, fully rebindable).
@@ -89,7 +89,7 @@ The config lives at `config/duraping.json` and is created on first launch.
 }
 ```
 
-On Fabric you can edit everything live from **Escape, Mods, DuraPing, Config** (requires Mod Menu and Cloth Config). Per-item overrides use the namespaced item id, for example `minecraft:netherite_pickaxe`.
+You can also edit everything live from the in-game config screen: **Escape → Mods → DuraPing → Config** on both loaders (Fabric also needs Mod Menu; both need Cloth Config). Per-item overrides use the namespaced item id, for example `minecraft:netherite_pickaxe`.
 
 <br>
 
@@ -114,7 +114,7 @@ Rebind any of these under **Options, Controls, DuraPing**.
 | **Minecraft** | 1.21.9, 1.21.10, or 1.21.11 |
 | **Java** | 21 |
 
-**Optional (Fabric):** Mod Menu and Cloth Config for the in-game settings screen. Everything works without them through the config file.
+**Optional:** Cloth Config for the in-game settings screen (plus Mod Menu on Fabric). Everything works without them through the config file.
 
 <br>
 

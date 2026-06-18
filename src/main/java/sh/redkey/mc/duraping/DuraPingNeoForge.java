@@ -32,8 +32,12 @@ public class DuraPingNeoForge {
         modBus.addListener(this::clientSetup);
         modBus.addListener(this::registerKeyMappings);
         // In-game config screen: Mods list -> DuraPing -> Config (shared Cloth screen with Fabric).
-        container.registerExtensionPoint(IConfigScreenFactory.class,
-                (c, parent) -> DuraPingConfigScreen.create(parent));
+        // Cloth backs the screen; the mod still runs without it (JSON config), so only register
+        // when Cloth is present, mirroring Fabric's optional config UI.
+        if (net.neoforged.fml.ModList.get().isLoaded("cloth_config")) {
+            container.registerExtensionPoint(IConfigScreenFactory.class,
+                    (c, parent) -> DuraPingConfigScreen.create(parent));
+        }
     }
 
     private void clientSetup(FMLClientSetupEvent event) {

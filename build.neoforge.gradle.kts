@@ -115,10 +115,12 @@ publishMods {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = property("modrinth_id").toString()
         minecraftVersions.addAll(neoGameVersions)
+        requires("cloth-config")
     }
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = property("curseforge_id").toString()
         minecraftVersions.addAll(neoGameVersions)
+        requires { slug = "cloth-config" }
     }
 }
