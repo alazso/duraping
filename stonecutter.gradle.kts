@@ -1,6 +1,11 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    id("fabric-loom") version "1.14.10" apply false
+    // Loom 1.17 splits into two plugin ids (both on maven.fabricmc.net) so obfuscated (1.21.x)
+    // and unobfuscated (26.x) Minecraft can coexist in one build:
+    //   net.fabricmc.fabric-loom-remap -> obfuscated, Mojmap remapping  (build.fabric-o)
+    //   net.fabricmc.fabric-loom       -> unobfuscated, no remapping    (build.fabric-m)
+    id("net.fabricmc.fabric-loom-remap") version "1.17.11" apply false
+    id("net.fabricmc.fabric-loom") version "1.17.11" apply false
     id("net.neoforged.moddev") version "2.0.115" apply false
     id("me.modmuss50.mod-publish-plugin") version "0.7.4" apply false
 }
