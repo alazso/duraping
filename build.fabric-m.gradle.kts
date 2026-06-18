@@ -63,7 +63,7 @@ dependencies {
 val resourceProps = mapOf(
     "version" to property("version").toString(),
     "fabric_loader_version" to dep("fabric_loader"),
-    "fabric_minecraft_version_range" to ">=26.1 <27",
+    "fabric_minecraft_version_range" to ">=26.1.2 <26.2",
 )
 tasks.processResources {
     inputs.properties(resourceProps)

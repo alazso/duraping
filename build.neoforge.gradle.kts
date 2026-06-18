@@ -10,7 +10,7 @@ fun dep(key: String): String = property("${key}_$mcVersion") as String
 // splits the 1.21.x line (1.21.9-1.21.10 vs 1.21.11). Unobfuscated 26.x is its own jar.
 val is26 = mcVersion.substringBefore(".").toInt() >= 26
 val neoMcRange = when {
-    is26 -> "[26.1.2,27)"
+    is26 -> "[26.1.2,26.2)"
     mcVersion == "1.21.11" -> "[1.21.11,1.22)"
     else -> "[1.21.9,1.21.11)"
 }
