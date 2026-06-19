@@ -42,6 +42,7 @@ repositories {
     maven("https://maven.fabricmc.net/")
     maven("https://maven.shedaniel.me/")
     maven("https://maven.terraformersmc.com/releases/")
+    maven("https://repo.faststats.dev/releases")
 }
 
 sourceSets {
@@ -58,6 +59,11 @@ dependencies {
     implementation("net.fabricmc.fabric-api:fabric-api:${dep("fabric_api")}")
     implementation("com.terraformersmc:modmenu:${dep("modmenu")}")
     implementation("me.shedaniel.cloth:cloth-config-fabric:${dep("cloth")}")
+    // FastStats usage metrics (requires Java 25; this modern buildscript is 26.x only).
+    // gson is provided by Minecraft; drop FastStats's strict gson pin so it does not clash with MC's.
+    implementation("dev.faststats.metrics:fabric:0.27.0") {
+        exclude(group = "com.google.code.gson", module = "gson")
+    }
 }
 
 val resourceProps = mapOf(

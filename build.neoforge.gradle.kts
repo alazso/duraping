@@ -58,6 +58,7 @@ repositories {
     maven("https://maven.neoforged.net/releases/")
     maven("https://maven.parchmentmc.org/")
     maven("https://maven.shedaniel.me/")
+    maven("https://repo.faststats.dev/releases")
 }
 
 sourceSets {
@@ -69,6 +70,11 @@ sourceSets {
 dependencies {
     // Cloth Config powers the in-game config screen (DuraPingConfigScreen), shared with Fabric.
     implementation("me.shedaniel.cloth:cloth-config-neoforge:${dep("cloth")}")
+    // FastStats usage metrics requires Java 25, so only the 26.x node gets it.
+    // gson is provided by Minecraft; drop FastStats's strict gson pin so it does not clash with MC's.
+    if (is26) implementation("dev.faststats.metrics:neoforge:0.27.0") {
+        exclude(group = "com.google.code.gson", module = "gson")
+    }
 }
 
 neoForge {

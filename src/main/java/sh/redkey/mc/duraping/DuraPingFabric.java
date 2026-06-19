@@ -21,6 +21,15 @@ public class DuraPingFabric implements ClientModInitializer {
     private static KeyMapping autoSwapMainHandKey;
     private static KeyMapping autoSwapArmorKey;
 
+    // FastStats usage metrics (requires Java 25, so 26.x only). Held to keep the reporter alive.
+    //? if >=26.1.2 {
+    /*@SuppressWarnings("unused")
+    private final dev.faststats.fabric.FabricContext fastStats =
+            new dev.faststats.fabric.FabricContext.Factory("duraping", "6fc822d7506cfb8bc39e1f0f83a4c854")
+                    .metrics(dev.faststats.Metrics.Factory::create)
+                    .create();
+    *///?}
+
     @Override
     public void onInitializeClient() {
         DuraPing.init();
