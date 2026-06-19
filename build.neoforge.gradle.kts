@@ -129,7 +129,7 @@ publishMods {
     displayName = "DuraPing ${property("version")} (NeoForge $neoLabel)"
     version = project.version.toString()
     changelog = providers.environmentVariable("RELEASE_CHANGELOG")
-        .orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
+        .orElse("See https://github.com/alazso/duraping/blob/main/CHANGELOG.md")
     dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
     modrinth {

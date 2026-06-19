@@ -4,15 +4,12 @@
 
 **Never break your favorite gear again.** Timely durability alerts through chat, sound, screen flash, or hotbar toast, the moment a tool, weapon, or armor piece runs low.
 
-[![Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&style=for-the-badge&label=build)](https://github.com/redlynxlabs/duraping/actions)
-[![Downloads](https://img.shields.io/modrinth/dt/duraping?style=for-the-badge&logo=modrinth&label=downloads&color=00AF5C)](https://modrinth.com/mod/duraping)
-[![Minecraft](https://img.shields.io/badge/Fabric%20·%20NeoForge-1.21.9%2B-2b2d31?style=for-the-badge)](https://fabricmc.net/)
-[![License](https://img.shields.io/badge/license-MIT-2b2d31?style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
+[![Build](https://img.shields.io/github/actions/workflow/status/alazso/duraping/ci.yml?branch=main&style=for-the-badge&label=build)](https://github.com/alazso/duraping/actions)
+[![Total downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Ffaststats.dev%2Fapi%2Fshields%2Fduraping%3Fmetric%3Ddownloads&style=for-the-badge)](https://faststats.dev/project/duraping)
+[![License](https://img.shields.io/badge/license-MIT-2b2d31?style=for-the-badge)](https://github.com/alazso/duraping/blob/main/LICENSE)
 
-[![Modrinth](https://img.shields.io/badge/Modrinth-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/mod/duraping)
-[![CurseForge](https://img.shields.io/badge/CurseForge-F16436?style=for-the-badge&logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/duraping)
-[![Source](https://img.shields.io/badge/Source-0f0f0f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/redlynxlabs/duraping)
-[![Discord](https://img.shields.io/discord/1402745018682179624?style=for-the-badge&logo=discord&logoColor=white&label=discord&color=5865F2)](https://discord.gg/hologram)
+[![Source](https://img.shields.io/badge/Source-0f0f0f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alazso/duraping)
+[![Support Discord](https://img.shields.io/discord/1510890328943628350?style=for-the-badge&logo=discord&logoColor=white&label=discord&color=5865F2)](https://discord.gg/m3AKQfrMS5)
 
 </div>
 
@@ -126,12 +123,12 @@ DuraPing is **fully client-side**. It reads only your own inventory and never ta
 
 ## Found a bug? Have an idea?
 
-Bug reports and feature ideas are welcome. Open a [GitHub issue](https://github.com/redlynxlabs/duraping/issues) with your loader and Minecraft version, your DuraPing version, and any relevant console output. For quick questions or to help test, join the [Discord](https://discord.gg/hologram).
+Bug reports and feature ideas are welcome. Open a [GitHub issue](https://github.com/alazso/duraping/issues) with your loader and Minecraft version, your DuraPing version, and any relevant console output. For quick questions or to help test, join the [Discord](https://discord.gg/m3AKQfrMS5).
 
 <br>
 
 <div align="center">
 
-Released under the [MIT License](https://github.com/redlynxlabs/duraping/blob/main/LICENSE).
+Released under the [MIT License](https://github.com/alazso/duraping/blob/main/LICENSE).
 
 </div>

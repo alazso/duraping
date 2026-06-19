@@ -2,7 +2,7 @@
 
 All notable changes to DuraPing are documented here. This project follows
 [Semantic Versioning](https://semver.org). Releases before 0.6.0 are listed on the
-[GitHub releases](https://github.com/redlynxlabs/duraping/releases) page.
+[GitHub releases](https://github.com/alazso/duraping/releases) page.
 
 ## [0.7.0] - 2026-06-19
 
@@ -49,5 +49,5 @@ All notable changes to DuraPing are documented here. This project follows
 - Per-version release branches and the `v...-stable-1.21.x` tag scheme, replaced
   by plain `vX.Y.Z` tags on a single branch.
 
-[0.7.0]: https://github.com/redlynxlabs/duraping/releases/tag/v0.7.0
-[0.6.0]: https://github.com/redlynxlabs/duraping/releases/tag/v0.6.0
+[0.7.0]: https://github.com/alazso/duraping/releases/tag/v0.7.0
+[0.6.0]: https://github.com/alazso/duraping/releases/tag/v0.6.0
