@@ -1,5 +1,6 @@
 plugins {
     id("net.fabricmc.fabric-loom")
+    id("me.modmuss50.mod-publish-plugin")
 }
 
 val mcVersion = project.name.substringBeforeLast("-")
@@ -88,5 +89,35 @@ tasks.processResources {
     inputs.properties(resourceProps)
     filesMatching("fabric.mod.json") {
         expand(resourceProps)
+    }
+}
+
+publishMods {
+    // No-remap loom: the final artifact is the jar task (no remapJar), with FastStats bundled in.
+    file = tasks.named<org.gradle.api.tasks.bundling.AbstractArchiveTask>("jar").flatMap { it.archiveFile }
+    type = me.modmuss50.mpp.ReleaseType.STABLE
+    modLoaders.add("fabric")
+    displayName = "DuraPing ${property("version")} (Fabric $mcVersion)"
+    // Distinct version number from the NeoForge 26.x jar (both share the 26.1.2 game version).
+    version = "${property("version")}+fabric-$mcVersion"
+    changelog = providers.environmentVariable("RELEASE_CHANGELOG")
+        .orElse("See https://github.com/redlynxlabs/duraping/blob/main/CHANGELOG.md")
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = property("modrinth_id").toString()
+        minecraftVersions.add(mcVersion)
+        requires("fabric-api")
+        requires("cloth-config")
+        optional("modmenu")
+    }
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = property("curseforge_id").toString()
+        minecraftVersions.add(mcVersion)
+        requires { slug = "fabric-api" }
+        requires { slug = "cloth-config" }
+        optional { slug = "modmenu" }
     }
 }
