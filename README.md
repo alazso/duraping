@@ -108,8 +108,8 @@ Rebind any of these under **Options, Controls, DuraPing**.
 |   |   |
 |---|---|
 | **Loader** | Fabric or NeoForge |
-| **Minecraft** | 1.21.9, 1.21.10, or 1.21.11 |
-| **Java** | 21 |
+| **Minecraft** | 1.21.9, 1.21.10, 1.21.11, or 26.1.2 |
+| **Java** | 21 (1.21.x) or 25 (26.x) |
 
 **Optional:** Cloth Config for the in-game settings screen (plus Mod Menu on Fabric). Everything works without them through the config file.
 
