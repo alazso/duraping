@@ -42,3 +42,16 @@ jobs:
               https://api.modrinth.com/v2/user || echo 000)"
             echo "[$label] HTTP $code  username=$(jq -r '.username // "-"' body.json 2>/dev/null || echo '?')"
           done
+          echo "--- scope probe: POST /v2/version with empty data (creates nothing) ---"
+          code="$(curl -sS -o probe.json -w '%{http_code}' -X POST \
+            -H "Authorization: $RAW" \
+            -H "User-Agent: duraping-ci-tokencheck/1.0 (modrinth@mail.redkey.sh)" \
+            -F 'data={}' \
+            https://api.modrinth.com/v2/version || echo 000)"
+          echo "POST /v2/version (empty) -> HTTP $code"
+          echo "body: $(head -c 300 probe.json 2>/dev/null)"
+          case "$code" in
+            401) echo "=> verdict: token LACKS Create versions (or upload permission).";;
+            400) echo "=> verdict: token HAS create permission (400 is just the empty payload).";;
+            *)   echo "=> verdict: unexpected, inspect the body above.";;
+          esac
