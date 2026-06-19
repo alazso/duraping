@@ -7,7 +7,7 @@
   "authors": ["RedLynx Labs", "redkey"],
   "contact": {
     "homepage": "https://redlynx.io",
-    "sources": "https://github.com/redlynxlabs/duraping"
+    "sources": "https://github.com/alazso/duraping"
   },
   "license": "MIT",
   "environment": "client",

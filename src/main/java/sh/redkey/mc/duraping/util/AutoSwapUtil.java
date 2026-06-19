@@ -90,10 +90,8 @@ public class AutoSwapUtil {
             switchHotbarSlot(player, newSlot);
             lastSwapTime.put(currentSlot, currentTime);
             
-            player.displayClientMessage(
-                Component.literal("§6[DuraPing] Auto-swapped to slot " + (newSlot + 1)), 
-                true
-            );
+            DuraPing.sendActionBar(player,
+                Component.literal("§6[DuraPing] Auto-swapped to slot " + (newSlot + 1)));
             player.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
             
             Constants.LOG.debug("Auto-swapped from slot {} to slot {}", currentSlot + 1, newSlot + 1);
@@ -345,8 +343,8 @@ public class AutoSwapUtil {
             }
 
             DuraPing.toast("Auto-swap: " + newStack.getHoverName().getString());
-            player.displayClientMessage(Component.literal("§6[DuraPing] Auto-swapped "
-                    + oldStack.getHoverName().getString() + " for " + newStack.getHoverName().getString()), false);
+            DuraPing.sendChat(player, Component.literal("§6[DuraPing] Auto-swapped "
+                    + oldStack.getHoverName().getString() + " for " + newStack.getHoverName().getString()));
 
             String itemId = currentItem.getItem().toString() + "_" + currentItem.getMaxDamage();
             String cooldownKey = slot.getName() + "_" + player.getStringUUID() + "_" + itemId;

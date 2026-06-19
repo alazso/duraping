@@ -8,17 +8,26 @@ publishes them to GitHub, Modrinth, and CurseForge.
 
 ## Supported versions
 
-Declared in the Stonecutter `create` block in `settings.gradle.kts`: Minecraft
-1.21.9, 1.21.10, and 1.21.11, each for Fabric and NeoForge (six jars). Per-version
-dependency coordinates live in `gradle.properties`, keyed by Minecraft version
-(for example `fabric_api_1.21.11`).
+Declared in the Stonecutter `create` block in `settings.gradle.kts`. Minecraft
+1.21.9, 1.21.10, and 1.21.11 are supported on both loaders, packaged as three jars:
+
+- **Fabric** (one jar, 1.21.9-1.21.11): Fabric's intermediary mappings stay stable
+  across these patches, including the 1.21.11 `ResourceLocation` -> `Identifier`
+  rename, so a single jar runs on all three.
+- **NeoForge** (two jars): NeoForge runs against Mojang mappings with no
+  intermediary layer, so the 1.21.11 rename forces a split into a 1.21.9-1.21.10 jar
+  and a 1.21.11 jar.
+
+Per-version dependency coordinates live in `gradle.properties`, keyed by Minecraft
+version (for example `fabric_api_1.21.11`).
 
 ## Building locally
 
-- `./gradlew chiseledBuild` builds all six jars, into `versions/<version>-<loader>/build/libs/`.
-- `./gradlew :1.21.10-fabric:build` builds a single node.
+- `./gradlew chiseledBuild` builds all three jars, into `versions/<node>/build/libs/`.
+- `./gradlew :1.21.9-fabric:build` builds a single node (nodes: `1.21.9-fabric`,
+  `1.21.9-neoforge`, `1.21.11-neoforge`).
 - `./gradlew "Reset active project"` normalizes the working tree to the canonical
-  version (1.21.10-fabric). Run this before committing so the versioned `//?`
+  node (1.21.9-fabric). Run this before committing so the versioned `//?`
   comments are in a consistent state.
 
 ## Cutting a release
@@ -34,7 +43,7 @@ dependency coordinates live in `gradle.properties`, keyed by Minecraft version
    ```
 
 The `Release` workflow validates the tag against `gradle.properties`, runs
-`chiseledBuild`, creates the GitHub release with all six jars, and runs
+`chiseledBuild`, creates the GitHub release with all three jars, and runs
 `chiseledPublish` to Modrinth and CurseForge.
 
 ## Dry run
@@ -44,10 +53,13 @@ to build and stage the jars without creating a release or publishing.
 
 ## Notes
 
-- Idempotent: the workflow skips if the tag's release already has its six jars.
+- Idempotent: the workflow skips if the tag's release already has its three jars.
 - Publishing needs the `MODRINTH_TOKEN` and `CURSEFORGE_API_KEY` repository
   secrets; without them the publish runs as a dry run.
-- Adding a Minecraft version: add `mc("X.Y.Z")` in `settings.gradle.kts`, fill its
-  coordinates in `gradle.properties`, run `./gradlew "Refresh active project"`, and
-  add any `//?` blocks or `replacements` for API differences. 26.x will be a
+- Adding a Minecraft version: fill its coordinates in `gradle.properties`. A Fabric
+  patch inside the current line usually just needs the `minecraft` range widened (no
+  new node). A new NeoForge jar is only needed at an API break like the 1.21.11
+  rename: add a `version("X.Y.Z-neoforge", "X.Y.Z")` node in `settings.gradle.kts`
+  and extend the `neoMcRange`/`neoLabel` split in `build.neoforge.gradle.kts`. Run
+  `./gradlew "Refresh active project"` after changing the matrix. 26.x will be a
   separate, larger bracket (unobfuscated, Java 25).

@@ -4,15 +4,12 @@
 
 **Never break your favorite gear again.** Timely durability alerts through chat, sound, screen flash, or hotbar toast, the moment a tool, weapon, or armor piece runs low.
 
-[![Build](https://img.shields.io/github/actions/workflow/status/redlynxlabs/duraping/ci.yml?branch=main&style=for-the-badge&label=build)](https://github.com/redlynxlabs/duraping/actions)
-[![Downloads](https://img.shields.io/modrinth/dt/duraping?style=for-the-badge&logo=modrinth&label=downloads&color=00AF5C)](https://modrinth.com/mod/duraping)
-[![Minecraft](https://img.shields.io/badge/Fabric%20·%20NeoForge-1.21.9%2B-2b2d31?style=for-the-badge)](https://fabricmc.net/)
-[![License](https://img.shields.io/badge/license-MIT-2b2d31?style=for-the-badge)](https://github.com/redlynxlabs/duraping/blob/main/LICENSE)
+[![Build](https://img.shields.io/github/actions/workflow/status/alazso/duraping/ci.yml?branch=main&style=for-the-badge&label=build)](https://github.com/alazso/duraping/actions)
+[![Total downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Ffaststats.dev%2Fapi%2Fshields%2Fduraping%3Fmetric%3Ddownloads&style=for-the-badge)](https://faststats.dev/project/duraping)
+[![License](https://img.shields.io/badge/license-MIT-2b2d31?style=for-the-badge)](https://github.com/alazso/duraping/blob/main/LICENSE)
 
-[![Modrinth](https://img.shields.io/badge/Modrinth-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/mod/duraping)
-[![CurseForge](https://img.shields.io/badge/CurseForge-F16436?style=for-the-badge&logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/duraping)
-[![Source](https://img.shields.io/badge/Source-0f0f0f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/redlynxlabs/duraping)
-[![Discord](https://img.shields.io/discord/1402745018682179624?style=for-the-badge&logo=discord&logoColor=white&label=discord&color=5865F2)](https://discord.gg/hologram)
+[![Source](https://img.shields.io/badge/Source-0f0f0f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alazso/duraping)
+[![Support Discord](https://img.shields.io/discord/1510890328943628350?style=for-the-badge&logo=discord&logoColor=white&label=discord&color=5865F2)](https://discord.gg/m3AKQfrMS5)
 
 </div>
 
@@ -32,7 +29,7 @@ DuraPing is a **client-side quality-of-life mod** that watches the durability of
 | 🤫 **Smart anti-spam** | Per-tier cooldowns, hysteresis re-arming, and activity-aware quieting while you mine. |
 | 🎚️ **Per-item thresholds** | Override warn, danger, and critical percentages for specific items by id. |
 | ⏱️ **Snooze and toggle** | Keybinds to silence alerts for a few minutes or switch the mod off entirely. |
-| 🧩 **In-game config** | A clean Mod Menu + Cloth Config screen on Fabric; a plain JSON file on both loaders. |
+| 🧩 **In-game config** | A Cloth Config screen on both loaders (Fabric via Mod Menu, NeoForge via the Mods list), plus a plain JSON file. |
 | 🌍 **Client-side only** | Works on vanilla servers, modded servers, and singleplayer. No server install. |
 
 <br>
@@ -56,7 +53,7 @@ DuraPing is a **client-side quality-of-life mod** that watches the durability of
 **Customization**
 - **Per-item overrides**: different thresholds for an elytra, a netherite pickaxe, or anything else, keyed by item id.
 - Tunable thresholds, per-tier cooldowns, and snooze duration.
-- **In-game config screen on Fabric** via Mod Menu and Cloth Config. On NeoForge, edit the config file directly.
+- **In-game config screen on both loaders** via Cloth Config: Fabric through Mod Menu, NeoForge through the Mods list (Mods → DuraPing → Config). The JSON config file still works everywhere.
 
 **Controls**
 - Keybinds to **toggle**, **snooze or cancel**, and **show main-hand durability** on demand (defaults on the numpad, fully rebindable).
@@ -89,7 +86,7 @@ The config lives at `config/duraping.json` and is created on first launch.
 }
 ```
 
-On Fabric you can edit everything live from **Escape, Mods, DuraPing, Config** (requires Mod Menu and Cloth Config). Per-item overrides use the namespaced item id, for example `minecraft:netherite_pickaxe`.
+You can also edit everything live from the in-game config screen: **Escape → Mods → DuraPing → Config** on both loaders (Fabric also needs Mod Menu; both need Cloth Config). Per-item overrides use the namespaced item id, for example `minecraft:netherite_pickaxe`.
 
 <br>
 
@@ -111,10 +108,10 @@ Rebind any of these under **Options, Controls, DuraPing**.
 |   |   |
 |---|---|
 | **Loader** | Fabric or NeoForge |
-| **Minecraft** | 1.21.9, 1.21.10, or 1.21.11 |
-| **Java** | 21 |
+| **Minecraft** | 1.21.9, 1.21.10, 1.21.11, or 26.1.2 |
+| **Java** | 21 (1.21.x) or 25 (26.x) |
 
-**Optional (Fabric):** Mod Menu and Cloth Config for the in-game settings screen. Everything works without them through the config file.
+**Optional:** Cloth Config for the in-game settings screen (plus Mod Menu on Fabric). Everything works without them through the config file.
 
 <br>
 
@@ -126,12 +123,12 @@ DuraPing is **fully client-side**. It reads only your own inventory and never ta
 
 ## Found a bug? Have an idea?
 
-Bug reports and feature ideas are welcome. Open a [GitHub issue](https://github.com/redlynxlabs/duraping/issues) with your loader and Minecraft version, your DuraPing version, and any relevant console output. For quick questions or to help test, join the [Discord](https://discord.gg/hologram).
+Bug reports and feature ideas are welcome. Open a [GitHub issue](https://github.com/alazso/duraping/issues) with your loader and Minecraft version, your DuraPing version, and any relevant console output. For quick questions or to help test, join the [Discord](https://discord.gg/m3AKQfrMS5).
 
 <br>
 
 <div align="center">
 
-Released under the [MIT License](https://github.com/redlynxlabs/duraping/blob/main/LICENSE).
+Released under the [MIT License](https://github.com/alazso/duraping/blob/main/LICENSE).
 
 </div>

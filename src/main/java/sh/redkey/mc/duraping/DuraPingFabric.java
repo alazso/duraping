@@ -21,6 +21,15 @@ public class DuraPingFabric implements ClientModInitializer {
     private static KeyMapping autoSwapMainHandKey;
     private static KeyMapping autoSwapArmorKey;
 
+    // FastStats usage metrics (requires Java 25, so 26.x only). Held to keep the reporter alive.
+    //? if >=26.1.2 {
+    /*@SuppressWarnings("unused")
+    private final dev.faststats.fabric.FabricContext fastStats =
+            new dev.faststats.fabric.FabricContext.Factory("duraping", "6fc822d7506cfb8bc39e1f0f83a4c854")
+                    .metrics(dev.faststats.Metrics.Factory::create)
+                    .create();
+    *///?}
+
     @Override
     public void onInitializeClient() {
         DuraPing.init();
@@ -29,6 +38,16 @@ public class DuraPingFabric implements ClientModInitializer {
         registerKeybinds();
 
         // Register HUD flash overlay
+        //? if >=26.1.2 {
+        /*HudElementRegistry.addLast(net.minecraft.resources.Identifier.fromNamespaceAndPath("duraping", "flash"), (extractor, deltaTracker) -> {
+            float alpha = DuraPing.getFlashAlpha();
+            if (alpha <= 0f) return;
+            int w = extractor.guiWidth();
+            int h = extractor.guiHeight();
+            int a = (int)(alpha * 120) << 24;
+            extractor.fill(0, 0, w, h, 0x00FFFFFF | a);
+        });
+        *///?} else {
         HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
             float alpha = DuraPing.getFlashAlpha();
             if (alpha <= 0f) return;
@@ -40,6 +59,7 @@ public class DuraPingFabric implements ClientModInitializer {
             int a = (int)(alpha * 120) << 24;
             guiGraphics.fill(0, 0, w, h, 0x00FFFFFF | a);
         });
+        //?}
 
         // Register attack/use callbacks for auto-swap
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {

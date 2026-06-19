@@ -7,11 +7,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import sh.redkey.mc.duraping.config.DuraPingConfigScreen;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.lwjgl.glfw.GLFW;
@@ -25,9 +28,25 @@ public class DuraPingNeoForge {
     private static KeyMapping autoSwapMainHandKey;
     private static KeyMapping autoSwapArmorKey;
 
-    public DuraPingNeoForge(IEventBus modBus) {
+    // FastStats usage metrics (requires Java 25, so 26.x only). Held to keep the reporter alive.
+    //? if >=26.1.2 {
+    @SuppressWarnings("unused")
+    private final dev.faststats.neoforge.NeoForgeContext fastStats =
+            new dev.faststats.neoforge.NeoForgeContext.Factory("duraping", "6fc822d7506cfb8bc39e1f0f83a4c854")
+                    .metrics(dev.faststats.Metrics.Factory::create)
+                    .create();
+    //?}
+
+    public DuraPingNeoForge(IEventBus modBus, ModContainer container) {
         modBus.addListener(this::clientSetup);
         modBus.addListener(this::registerKeyMappings);
+        // In-game config screen: Mods list -> DuraPing -> Config (shared Cloth screen with Fabric).
+        // Cloth backs the screen; the mod still runs without it (JSON config), so only register
+        // when Cloth is present, mirroring Fabric's optional config UI.
+        if (net.neoforged.fml.ModList.get().isLoaded("cloth_config")) {
+            container.registerExtensionPoint(IConfigScreenFactory.class,
+                    (c, parent) -> DuraPingConfigScreen.create(parent));
+        }
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
@@ -37,7 +56,7 @@ public class DuraPingNeoForge {
         NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onClientTick);
         NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onLeftClickBlock);
         NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onRightClickBlock);
-        NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onRenderGuiLayer);
+        NeoForge.EVENT_BUS.addListener(DuraPingNeoForge::onRenderGui);
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {
@@ -99,7 +118,9 @@ public class DuraPingNeoForge {
         DuraPing.onUseBlock();
     }
 
-    private static void onRenderGuiLayer(RenderGuiLayerEvent.Post event) {
+    private static void onRenderGui(RenderGuiEvent.Post event) {
+        // RenderGuiEvent.Post fires once per frame (RenderGuiLayerEvent fires per layer, which
+        // stacked the translucent flash ~15x into an opaque wash).
         renderFlashOverlay(event.getGuiGraphics());
     }
 

@@ -62,20 +62,22 @@ jobs:
             exit 0
           fi
           ASSET_COUNT="$(gh release view "$TAG" --json assets -q '.assets | length')"
-          # Six jars (three versions x two loaders).
-          if [ "$ASSET_COUNT" -ge 6 ]; then
+          # Three jars: one Fabric (1.21.9-1.21.11), two NeoForge (1.21.9-1.21.10 and 1.21.11).
+          if [ "$ASSET_COUNT" -ge 3 ]; then
             echo "Release $TAG already published; skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Set up JDK 21
+      - name: Set up JDK 21 and 25
         if: steps.published.outputs.skip != 'true'
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: |
+            21
+            25
 
       - name: Set up Gradle
         if: steps.published.outputs.skip != 'true'

@@ -19,14 +19,18 @@ rootProject.name = "DuraPing"
 
 stonecutter {
     create(rootProject) {
-        fun mc(version: String) {
-            version("$version-fabric", version).buildscript = "build.fabric.gradle.kts"
-            version("$version-neoforge", version).buildscript = "build.neoforge.gradle.kts"
-        }
-        mc("1.21.9")
-        mc("1.21.10")
-        mc("1.21.11")
+        // Fabric obfuscated (1.21.x): one jar covers 1.21.9-1.21.11; intermediary mappings make
+        // the 1.21.11 ResourceLocation->Identifier rename transparent at runtime (verified in-game).
+        version("1.21.9-fabric", "1.21.9").buildscript = "build.fabric-o.gradle.kts"
+        // NeoForge runs against Mojmap with no intermediary cushion, so the rename forces a split:
+        // one jar for 1.21.9-1.21.10 (verified), one for 1.21.11.
+        version("1.21.9-neoforge", "1.21.9").buildscript = "build.neoforge.gradle.kts"
+        version("1.21.11-neoforge", "1.21.11").buildscript = "build.neoforge.gradle.kts"
+        // Minecraft 26.x is unobfuscated: Fabric uses the "modern" loom buildscript (no Mojmap, Java 25);
+        // NeoForge (moddev) handles 26.x through the same buildscript as 1.21.x.
+        version("26.1.2-fabric", "26.1.2").buildscript = "build.fabric-m.gradle.kts"
+        version("26.1.2-neoforge", "26.1.2").buildscript = "build.neoforge.gradle.kts"
 
-        vcsVersion = "1.21.10-fabric"
+        vcsVersion = "1.21.9-fabric"
     }
 }
