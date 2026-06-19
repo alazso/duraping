@@ -10,6 +10,10 @@ on:
         description: Build artifacts only; do not publish a release
         type: boolean
         default: false
+      force_publish:
+        description: Re-publish to Modrinth and CurseForge even if the GitHub release already exists
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -56,6 +60,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          if [ "${{ inputs.force_publish }}" = "true" ]; then
+            echo "force_publish requested; not skipping."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           TAG="${{ steps.version.outputs.tag }}"
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
