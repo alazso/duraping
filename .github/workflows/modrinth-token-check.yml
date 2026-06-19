@@ -1,7 +1,7 @@
 name: Modrinth token check
 
-# Diagnostic only: makes the same createVersion call the publish plugin makes,
-# with the same secret token, and prints Modrinth's full response. Safe to delete.
+# Recovery: publishes the not-yet-uploaded jars to Modrinth via the raw API,
+# bypassing the publish plugin (which 401s where a raw call succeeds). Delete later.
 
 on:
   workflow_dispatch:
@@ -13,33 +13,28 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: Inspect MODRINTH_TOKEN
+  publish-remaining:
+    name: Publish remaining jars to Modrinth via API
     runs-on: ubuntu-latest
     steps:
-      - name: Fingerprint and real createVersion
+      - name: createVersion for the 4 jars not yet on Modrinth
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
-          if [ -z "${MODRINTH_TOKEN:-}" ]; then
-            echo "::error::MODRINTH_TOKEN is empty or not granted to this repo."; exit 1
-          fi
-          echo "secret sha256[:12] : $(printf '%s' "$MODRINTH_TOKEN" | sha256sum | cut -c1-12)"
-          echo "--- downloading one release jar to upload ---"
-          gh release download v0.7.0 -R alazso/duraping -p 'duraping-fabric-0.7.0+1.21.9-1.21.11.jar' -D . --clobber
-          cat > data.json <<'JSON'
-          {"name":"DuraPing 0.7.0 (Fabric 1.21.9-1.21.11)","version_number":"0.7.0+1.21.9-1.21.11","changelog":"","dependencies":[],"game_versions":["1.21.9","1.21.10","1.21.11"],"version_type":"release","loaders":["fabric"],"featured":false,"project_id":"JsUDKArh","file_parts":["file"],"primary_file":"file"}
-          JSON
-          echo "--- POST /v2/version (same token the plugin uses) ---"
-          code="$(curl -sS -o resp.json -w '%{http_code}' -X POST \
-            -H "Authorization: $MODRINTH_TOKEN" \
-            -H "User-Agent: duraping-ci-tokencheck/1.0 (modrinth@mail.redkey.sh)" \
-            -F 'data=<data.json;type=application/json' \
-            -F 'file=@duraping-fabric-0.7.0+1.21.9-1.21.11.jar' \
-            https://api.modrinth.com/v2/version || echo 000)"
-          echo "HTTP $code"
-          echo "FULL RESPONSE BODY:"
-          cat resp.json
-          echo
+          UA="duraping-ci/1.0 (modrinth@mail.redkey.sh)"
+          pub() {
+            local file="$1" vn="$2" gv="$3" loader="$4"
+            gh release download v0.7.0 -R alazso/duraping -p "$file" -D . --clobber
+            printf '{"name":"DuraPing %s","version_number":"%s","changelog":"","dependencies":[],"game_versions":[%s],"version_type":"release","loaders":["%s"],"featured":false,"project_id":"JsUDKArh","file_parts":["file"],"primary_file":"file"}' "$vn" "$vn" "$gv" "$loader" > d.json
+            code=$(curl -sS -o r.json -w '%{http_code}' -X POST \
+              -H "Authorization: $MODRINTH_TOKEN" -H "User-Agent: $UA" \
+              -F 'data=<d.json;type=application/json' -F "file=@$file" \
+              https://api.modrinth.com/v2/version || echo 000)
+            echo "[$vn] HTTP $code  $(jq -rc '{id, error, description}' r.json 2>/dev/null || cat r.json)"
+          }
+          pub "duraping-fabric-0.7.0+26.1.2.jar"            "0.7.0+fabric-26.1.2"  '"26.1.2"'           "fabric"
+          pub "duraping-neoforge-0.7.0+1.21.9-1.21.10.jar"  "0.7.0+1.21.9-1.21.10" '"1.21.9","1.21.10"' "neoforge"
+          pub "duraping-neoforge-0.7.0+1.21.11.jar"         "0.7.0+1.21.11"        '"1.21.11"'          "neoforge"
+          pub "duraping-neoforge-0.7.0+26.1.2.jar"          "0.7.0+26.1.2"         '"26.1.2"'           "neoforge"
