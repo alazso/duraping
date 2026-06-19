@@ -1,0 +1,44 @@
+name: Modrinth token check
+
+# Diagnostic only: confirms what the MODRINTH_TOKEN secret actually contains,
+# without exposing it. Prints a non-reversible fingerprint and the account the
+# token authenticates as. Safe to delete once publishing is sorted.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/modrinth-token-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Inspect MODRINTH_TOKEN
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fingerprint and identify the secret token
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "${MODRINTH_TOKEN:-}" ]; then
+            echo "::error::MODRINTH_TOKEN is empty or not granted to this repo."
+            exit 1
+          fi
+          RAW="$MODRINTH_TOKEN"
+          TRIMMED="$(printf '%s' "$MODRINTH_TOKEN" | tr -d '[:space:]')"
+          echo "length (bytes), raw     : $(printf '%s' "$RAW"     | wc -c)"
+          echo "length (bytes), trimmed : $(printf '%s' "$TRIMMED" | wc -c)"
+          echo "sha256[:12], raw        : $(printf '%s' "$RAW"     | sha256sum | cut -c1-12)"
+          echo "sha256[:12], trimmed    : $(printf '%s' "$TRIMMED" | sha256sum | cut -c1-12)"
+          echo "--- GET https://api.modrinth.com/v2/user (no version is created) ---"
+          for label in raw trimmed; do
+            if [ "$label" = raw ]; then TOK="$RAW"; else TOK="$TRIMMED"; fi
+            code="$(curl -sS -o body.json -w '%{http_code}' \
+              -H "Authorization: $TOK" \
+              -H "User-Agent: duraping-ci-tokencheck/1.0 (modrinth@mail.redkey.sh)" \
+              https://api.modrinth.com/v2/user || echo 000)"
+            echo "[$label] HTTP $code  username=$(jq -r '.username // "-"' body.json 2>/dev/null || echo '?')"
+          done
