@@ -77,6 +77,21 @@ dependencies {
     }
 }
 
+// FastStats ships as a plain library (no mods.toml), so merge its classes into the jar for
+// runtime (26.x only; gson is excluded above, Minecraft provides it).
+if (is26) {
+    tasks.jar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        from({
+            configurations.runtimeClasspath.get()
+                    .filter { it.path.contains("dev.faststats") }
+                    .map { zipTree(it) }
+        }) {
+            exclude("module-info.class", "META-INF/MANIFEST.MF")
+        }
+    }
+}
+
 neoForge {
     version = dep("neoforge")
     findProperty("parchment_$mcVersion")?.let { pv ->

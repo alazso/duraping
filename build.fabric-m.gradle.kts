@@ -66,6 +66,19 @@ dependencies {
     }
 }
 
+// FastStats ships as a plain library (no fabric.mod.json), so merge its classes into the jar
+// for runtime (gson is excluded above; Minecraft provides it).
+tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from({
+        configurations.runtimeClasspath.get()
+                .filter { it.path.contains("dev.faststats") }
+                .map { zipTree(it) }
+    }) {
+        exclude("module-info.class", "META-INF/MANIFEST.MF")
+    }
+}
+
 val resourceProps = mapOf(
     "version" to property("version").toString(),
     "fabric_loader_version" to dep("fabric_loader"),
